@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/nav_graph"
+        app:startDestination="@id/mainFragment">
+
+    <fragment
+            android:id="@+id/mainFragment"
+            android:name="com.friney.fairsplit.ui.main.MainFragment"
+            android:label="fragment_main"
+            tools:layout="@layout/fragment_main">
+        <action
+                android:id="@+id/action_mainFragment_to_detailsFragment"
+                app:destination="@id/detailsFragment"
+                app:enterAnim="@android:anim/slide_out_right"
+                app:exitAnim="@android:anim/slide_out_right"
+                app:popEnterAnim="@android:anim/slide_in_left"
+                app:popExitAnim="@android:anim/slide_out_right" />
+        <action
+                android:id="@+id/action_mainFragment_to_createEventFragment"
+                app:destination="@id/createEventFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/detailsFragment"
+            android:name="com.friney.fairsplit.ui.details.DetailsFragment"
+            android:label="fragment_details"
+            tools:layout="@layout/fragment_details" />
+    <fragment
+            android:id="@+id/settingsFragment"
+            android:name="com.friney.fairsplit.ui.settings.SettingsFragment"
+            android:label="fragment_settings"
+            tools:layout="@layout/fragment_settings" />
+    <fragment
+            android:id="@+id/createEventFragment"
+            android:name="com.friney.fairsplit.ui.create.event.CreateEventFragment"
+            android:label="fragment_create_event"
+            tools:layout="@layout/fragment_create_event">
+        <action
+                android:id="@+id/action_createEventFragment_to_createReceiptFragment"
+                app:destination="@id/createReceiptFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/createReceiptFragment"
+            android:name="com.friney.fairsplit.ui.create.receipt.CreateReceiptFragment"
+            android:label="fragment_create_receipt"
+            tools:layout="@layout/fragment_create_receipt">
+        <action
+                android:id="@+id/action_createReceiptFragment_to_createExpenseFragment"
+                app:destination="@id/createExpenseFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/createExpenseFragment"
+            android:name="com.friney.fairsplit.ui.create.expense.CreateExpenseFragment"
+            android:label="fragment_create_expense"
+            tools:layout="@layout/fragment_create_expense" />
+</navigation>
