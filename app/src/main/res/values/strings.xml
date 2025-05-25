@@ -2,4 +2,16 @@
     <string name="app_name">FairSplit</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="account">Аккаунт</string>
+    <string name="exit_from_account">Выйти из аккаунта</string>
+    <string name="event_description">Описание события</string>
+    <string name="create_button">Создать</string>
+    <string name="event_name">Название события</string>
+    <string name="create_event_title">Создание события</string>
+    <string name="tabs_receipts">Чеки</string>
+    <string name="tabs_summary">Итог</string>
+    <string name="delete">Удалить</string>
+    <string name="edit">Редактировать</string>
+    <string name="ruble_symbol">₽</string>
+    <string name="paid_by">Оплатил: %1$s</string>
 </resources>

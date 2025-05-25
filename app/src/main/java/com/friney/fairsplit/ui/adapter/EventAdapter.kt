@@ -10,7 +10,6 @@ import com.friney.fairsplit.network.model.Event
 
 class EventAdapter : RecyclerView.Adapter<EventAdapter.FairSplitViewHolder>() {
 
-    //    inner class FairSplitViewHolder(view: View) : RecyclerView.ViewHolder(view)
     inner class FairSplitViewHolder(val binding: ItemEventBinding) :
         RecyclerView.ViewHolder(binding.root)
 
@@ -49,12 +48,12 @@ class EventAdapter : RecyclerView.Adapter<EventAdapter.FairSplitViewHolder>() {
         holder: FairSplitViewHolder,
         position: Int
     ) {
-        val article = differ.currentList[position]
+        val event = differ.currentList[position]
         holder.binding.apply {
-            eventName.text = article.name
-            eventDescription.text = article.description
+            eventName.text = event.name
+            eventDescription.text = event.description
             root.setOnClickListener {
-                onItemClickListener?.let { it(article) }
+                onItemClickListener?.let { it(event) }
             }
         }
     }

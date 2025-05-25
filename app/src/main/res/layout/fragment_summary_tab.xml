@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+        <!-- Total Amount -->
+        <TextView
+                android:id="@+id/total_amount_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/total_amount"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+                android:id="@+id/total_amount_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/total_amount_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="1,395.28 ₽" />
+
+        <!-- Spent by each participant -->
+        <TextView
+                android:id="@+id/spent_by_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/spent_by_participants"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@id/total_amount_label" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/spent_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/spent_by_label"
+                tools:listitem="@layout/item_participant_spent" />
+
+        <!-- Debts between participants -->
+        <TextView
+                android:id="@+id/debts_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/debts_between_participants"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@id/spent_recycler_view" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/debts_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/debts_label"
+                tools:listitem="@layout/item_debt" />
+
+        <!-- Receipts summary -->
+        <TextView
+                android:id="@+id/receipts_summary_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/receipts_summary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@id/debts_recycler_view" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/receipts_summary_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/receipts_summary_label"
+                tools:listitem="@layout/item_receipt_summary" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

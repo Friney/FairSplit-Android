@@ -1,53 +1,44 @@
 package com.friney.fairsplit.ui.main
 
-import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.friney.fairsplit.data.repository.event.EventRepository
-import com.friney.fairsplit.data.repository.user.UserRepository
+import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.network.model.Event
-import com.friney.fairsplit.network.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val userRepository: UserRepository,
     private val eventRepository: EventRepository
 ) : ViewModel() {
 
-    private val _user = MutableLiveData<List<User>>()
-    val user: LiveData<List<User>>
-        get() = _user
-
-    private val _event = MutableLiveData<List<Event>>()
-    val event: LiveData<List<Event>>
-        get() = _event
+    val eventLiveData = MutableLiveData<DataState<List<Event>>>()
 
     init {
-        getAllUser()
         getAllEvent()
     }
 
     private fun getAllEvent() = viewModelScope.launch {
-        eventRepository.getAllEvent().let {
+        eventLiveData.postValue(DataState.Loading())
+        eventRepository.getAll().let {
             if (it.isSuccessful) {
-                _event.postValue(it.body())
+                eventLiveData.postValue(DataState.Success(it.body() as List<Event>))
             } else {
-                Log.d("Error", it.errorBody().toString())
-            }
-        }
-    }
-
-    fun getAllUser() = viewModelScope.launch {
-        userRepository.getAllUser().let {
-            if (it.isSuccessful) {
-                _user.postValue(it.body())
-            } else {
-                Log.d("Error", it.errorBody().toString())
+                val errorBody = it.errorBody()?.string()
+                val errorMessage = if (!errorBody.isNullOrEmpty()) {
+                    try {
+                        JSONObject(errorBody).getString("message")
+                    } catch (e: Exception) {
+                        "Parse error: ${e.message}"
+                    }
+                } else {
+                    "Empty error body (HTTP ${it.code()})"
+                }
+                eventLiveData.postValue(DataState.Error(errorMessage))
             }
         }
     }
