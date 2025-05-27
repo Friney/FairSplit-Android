@@ -23,7 +23,6 @@ import com.friney.fairsplit.ui.adapter.ExpenseAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import java.math.BigDecimal
 import java.text.DecimalFormat
-import java.text.NumberFormat
 
 @AndroidEntryPoint
 class DetailsReceiptFragment : Fragment() {
@@ -96,10 +95,6 @@ class DetailsReceiptFragment : Fragment() {
             }
         }
 
-    }
-
-    private val currencyFormat = NumberFormat.getCurrencyInstance().apply {
-        maximumFractionDigits = 2
     }
 
     private fun initAdapter() {

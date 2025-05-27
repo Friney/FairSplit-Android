@@ -10,6 +10,8 @@ import com.friney.fairsplit.data.repository.expense.member.ExpenseMemberReposito
 import com.friney.fairsplit.data.repository.expense.member.NetworkExpenseMemberRepository
 import com.friney.fairsplit.data.repository.receipt.NetworkReceiptRepository
 import com.friney.fairsplit.data.repository.receipt.ReceiptRepository
+import com.friney.fairsplit.data.repository.summary.NetworkSummaryRepository
+import com.friney.fairsplit.data.repository.summary.SummaryRepository
 import com.friney.fairsplit.data.repository.user.NetworkUserRepository
 import com.friney.fairsplit.data.repository.user.UserRepository
 import com.friney.fairsplit.network.ApiConfigFairSplit
@@ -18,6 +20,7 @@ import com.friney.fairsplit.network.service.EventService
 import com.friney.fairsplit.network.service.ExpenseMemberService
 import com.friney.fairsplit.network.service.ExpenseService
 import com.friney.fairsplit.network.service.ReceiptService
+import com.friney.fairsplit.network.service.SummaryService
 import com.friney.fairsplit.network.service.UserService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -109,6 +112,11 @@ class AppModule {
         retrofit.create(ExpenseMemberService::class.java)
 
     @Provides
+    @Singleton
+    fun provideSummaryService(retrofit: Retrofit): SummaryService =
+        retrofit.create(SummaryService::class.java)
+
+    @Provides
     fun provideUserRepository(userService: UserService): UserRepository =
         NetworkUserRepository(userService)
 
@@ -135,5 +143,11 @@ class AppModule {
     @Singleton
     fun provideExpenseMemberRepository(expenseService: ExpenseMemberService): ExpenseMemberRepository =
         NetworkExpenseMemberRepository(expenseService)
+
+    @Provides
+    @Singleton
+    fun provideSummaryRepository(summaryService: SummaryService): SummaryRepository =
+        NetworkSummaryRepository(summaryService)
+
 
 }

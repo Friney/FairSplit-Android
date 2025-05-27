@@ -23,9 +23,6 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
 
         binding.bottomNavigationMenu.setupWithNavController(navController)
-//        binding.bottomNavigationMenu.setupWithNavController(
-//            navController = binding.navigationHostFragment.findNavController()
-//        )
     }
 
     override fun onDestroy() {
