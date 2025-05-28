@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+        <TextView
+                android:id="@+id/total_amount_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Общая сумма:"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+                android:id="@+id/total_amount_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/total_amount_label"
+                android:layout_marginTop="8dp">
+
+            <TextView
+                    android:id="@+id/total_amount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="26sp"
+                    tools:text="1395.28" />
+
+            <Space
+                    android:layout_width="4dp"
+                    android:layout_height="1dp" />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="26sp"
+                    android:text="@string/ruble_symbol" />
+        </LinearLayout>
+
+        <TextView
+                android:id="@+id/debts_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Кто кому должен:"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/total_amount_container" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/debts_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_debt"
+                app:layout_constraintTop_toBottomOf="@id/debts_label" />
+
+        <TextView
+                android:id="@+id/receipts_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Чеки:"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/debts_recycler_view" />
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/receipts_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_receipt_summary"
+                app:layout_constraintTop_toBottomOf="@id/receipts_label" />
+
+        <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?attr/progressBarStyle"
+                android:visibility="invisible"
+                tools:visibility="visible"
+                android:background="@android:color/transparent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

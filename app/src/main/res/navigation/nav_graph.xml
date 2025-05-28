@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/nav_graph"
+        app:startDestination="@id/mainFragment">
+    <fragment
+            android:id="@+id/mainFragment"
+            android:name="com.friney.fairsplit.ui.main.MainFragment"
+            android:label="fragment_main"
+            tools:layout="@layout/fragment_main">
+        <action
+                android:id="@+id/action_mainFragment_to_detailsEventFragment"
+                app:destination="@id/detailsEventFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/settingsFragment"
+            android:name="com.friney.fairsplit.ui.settings.SettingsFragment"
+            android:label="fragment_settings"
+            tools:layout="@layout/fragment_settings" />
+    <fragment
+            android:id="@+id/detailsEventFragment"
+            android:name="com.friney.fairsplit.ui.details.event.DetailsEventFragment"
+            android:label="fragment_details_event"
+            tools:layout="@layout/fragment_details_event">
+        <argument
+                android:name="event"
+                app:argType="com.friney.fairsplit.network.model.Event" />
+        <action
+                android:id="@+id/action_detailsEventFragment_to_detailsReceiptFragment"
+                app:destination="@id/detailsReceiptFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/detailsReceiptFragment"
+            android:name="com.friney.fairsplit.ui.details.receipt.DetailsReceiptFragment"
+            android:label="fragment_details_receipt"
+            tools:layout="@layout/fragment_details_receipt">
+        <argument
+                android:name="receipt"
+                app:argType="com.friney.fairsplit.network.model.Receipt" />
+        <action
+                android:id="@+id/action_detailsReceiptFragment_to_detailsExpenseFragment"
+                app:destination="@id/detailsExpenseFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/detailsExpenseFragment"
+            android:name="com.friney.fairsplit.ui.details.expense.DetailsExpenseFragment"
+            android:label="fragment_details_expense"
+            tools:layout="@layout/fragment_details_expense">
+        <argument
+                android:name="expense"
+                app:argType="com.friney.fairsplit.network.model.Expense" />
+    </fragment>
+</navigation>
