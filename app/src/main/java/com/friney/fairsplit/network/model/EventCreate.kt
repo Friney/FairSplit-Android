@@ -1,4 +1,6 @@
 package com.friney.fairsplit.network.model
 
-class EventCreate {
-}
+data class EventCreate(
+    val description: String,
+    val name: String
+)

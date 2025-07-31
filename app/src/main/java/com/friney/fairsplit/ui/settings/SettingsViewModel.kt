@@ -12,18 +12,17 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(
-    private val authRepository: AuthRepository
-) : ViewModel() {
+class SettingsViewModel @Inject constructor(private val authRepository: AuthRepository) :
+    ViewModel() {
 
     val userInAppLiveData = MutableLiveData<DataState<RegisteredUser>>()
 
     init {
-        getUserInApp()
+        getCurrentUser()
     }
 
-    private fun getUserInApp() = viewModelScope.launch {
-        authRepository.getUserInApp().let {
+    private fun getCurrentUser() = viewModelScope.launch {
+        authRepository.getCurrentUser().let {
             userInAppLiveData.postValue(DataState.Loading())
             if (it.isSuccessful) {
                 userInAppLiveData.postValue(DataState.Success(it.body() as RegisteredUser))
@@ -33,10 +32,10 @@ class SettingsViewModel @Inject constructor(
                     try {
                         JSONObject(errorBody).getString("message")
                     } catch (e: Exception) {
-                        "Parse error: ${e.message}"
+                        "Ошибка парсинга: ${e.message}"
                     }
                 } else {
-                    "Empty error body (HTTP ${it.code()})"
+                    "Ошибка HTTP ${it.code()}"
                 }
                 userInAppLiveData.postValue(DataState.Error(errorMessage))
             }

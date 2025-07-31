@@ -23,7 +23,7 @@ class NetworkEventRepository @Inject constructor(private val eventService: Event
         TODO("Not yet implemented")
     }
 
-    override suspend fun сreate(eventCreate: EventCreate): Response<Event> {
+    override suspend fun create(eventCreate: EventCreate): Response<Event> {
         TODO("Not yet implemented")
     }
 }

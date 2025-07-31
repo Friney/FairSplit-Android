@@ -10,15 +10,20 @@ import android.widget.PopupMenu
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.viewpager2.widget.ViewPager2
 import com.friney.fairsplit.R
 import com.friney.fairsplit.databinding.FragmentDetailsEventBinding
+import com.friney.fairsplit.ui.navigation.FragmentNavigator
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class DetailsEventFragment : Fragment() {
+
+    @Inject
+    lateinit var fragmentNavigator: FragmentNavigator
 
     private var _binding: FragmentDetailsEventBinding? = null
     private val mBinding get() = _binding!!
@@ -46,7 +51,7 @@ class DetailsEventFragment : Fragment() {
         }
 
         mBinding.backButton.setOnClickListener {
-            findNavController().navigateUp()
+            fragmentNavigator.navigateBack()
         }
 
         mBinding.menuButton.setOnClickListener { view ->
@@ -64,6 +69,16 @@ class DetailsEventFragment : Fragment() {
             tab.text = tabTitles.getOrNull(position)
                 ?: throw IllegalArgumentException("Invalid position $position")
         }.attach()
+
+        mBinding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                mBinding.addReceiptButton.visibility = when (position) {
+                    1 -> View.INVISIBLE
+                    else -> View.VISIBLE
+                }
+            }
+        })
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)

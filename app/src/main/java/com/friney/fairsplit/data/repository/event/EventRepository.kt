@@ -9,7 +9,7 @@ interface EventRepository {
 
     suspend fun getAll(): Response<List<Event>>
 
-    suspend fun сreate(eventCreate: EventCreate): Response<Event>
+    suspend fun create(eventCreate: EventCreate): Response<Event>
 
     suspend fun update(eventUpdate: EventUpdate, id: Long): Response<Event>
 

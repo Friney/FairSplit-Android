@@ -8,16 +8,19 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.friney.fairsplit.R
 import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.databinding.FragmentReceiptsTabBinding
 import com.friney.fairsplit.ui.adapter.ReceiptsAdapter
+import com.friney.fairsplit.ui.navigation.FragmentNavigator
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ReceiptsTabFragment : Fragment() {
+
+    @Inject
+    lateinit var fragmentNavigator: FragmentNavigator
 
     private var _binding: FragmentReceiptsTabBinding? = null
     private val mBinding get() = _binding!!
@@ -39,10 +42,7 @@ class ReceiptsTabFragment : Fragment() {
 
         receiptAdapter.setOnItemClickListener {
             val bundle = bundleOf("receipt" to it)
-            view.findNavController().navigate(
-                R.id.action_detailsEventFragment_to_detailsReceiptFragment,
-                bundle
-            )
+            fragmentNavigator.navigateMainToDetailsReceipt(bundle)
         }
 
         viewModel.receiptsLiveData.observe(viewLifecycleOwner) { response ->

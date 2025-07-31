@@ -11,19 +11,23 @@ import android.widget.PopupMenu
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.friney.fairsplit.R
 import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.databinding.FragmentDetailsExpenseBinding
 import com.friney.fairsplit.ui.adapter.ExpenseMemberAdapter
+import com.friney.fairsplit.ui.navigation.FragmentNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import java.math.BigDecimal
 import java.text.DecimalFormat
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class DetailsExpenseFragment : Fragment() {
+
+    @Inject
+    lateinit var fragmentNavigator: FragmentNavigator
 
     private var _binding: FragmentDetailsExpenseBinding? = null
     private val mBinding get() = _binding!!
@@ -52,7 +56,7 @@ class DetailsExpenseFragment : Fragment() {
         }
 
         mBinding.backButton.setOnClickListener {
-            findNavController().navigateUp()
+            fragmentNavigator.navigateBack()
         }
 
         mBinding.menuButton.setOnClickListener { view ->
