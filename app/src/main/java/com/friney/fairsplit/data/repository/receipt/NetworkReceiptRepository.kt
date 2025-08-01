@@ -1,6 +1,9 @@
 package com.friney.fairsplit.data.repository.receipt
 
+import com.friney.fairsplit.network.model.receipt.Receipt
+import com.friney.fairsplit.network.model.receipt.ReceiptCreate
 import com.friney.fairsplit.network.service.ReceiptService
+import retrofit2.Response
 import javax.inject.Inject
 
 class NetworkReceiptRepository @Inject constructor(private val receiptService: ReceiptService) :
@@ -8,4 +11,10 @@ class NetworkReceiptRepository @Inject constructor(private val receiptService: R
 
     override suspend fun getAllByEventId(eventId: Long) =
         receiptService.getAllByEventId(eventId)
+
+    override suspend fun create(
+        create: ReceiptCreate,
+        eventId: Long
+    ): Response<Receipt> =
+        receiptService.create(create, eventId)
 }

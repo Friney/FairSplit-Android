@@ -1,11 +1,11 @@
 package com.friney.fairsplit.network.service
 
 import com.friney.fairsplit.network.ApiConfigFairSplit
-import com.friney.fairsplit.network.model.CreateRegisteredUser
-import com.friney.fairsplit.network.model.JwtAuthentication
-import com.friney.fairsplit.network.model.RefreshToken
-import com.friney.fairsplit.network.model.RegisteredUser
-import com.friney.fairsplit.network.model.UserCredentials
+import com.friney.fairsplit.network.model.token.JwtAuthentication
+import com.friney.fairsplit.network.model.token.RefreshToken
+import com.friney.fairsplit.network.model.user.CreateRegisteredUser
+import com.friney.fairsplit.network.model.user.RegisteredUser
+import com.friney.fairsplit.network.model.user.UserCredentials
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

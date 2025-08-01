@@ -48,11 +48,7 @@ class MainFragment : Fragment() {
         }
 
         initAdapter()
-
-        eventAdapter.setOnItemClickListener {
-            val bundle = bundleOf("event" to it)
-            fragmentNavigator.navigateMainToDetailsEvent(bundle)
-        }
+        setOnItemClickListener()
 
         mBinding.addEventButton.setOnClickListener {
             fragmentNavigator.navigateMainToCreateEvent()
@@ -82,11 +78,23 @@ class MainFragment : Fragment() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshEvents()
+    }
+
     private fun initAdapter() {
         eventAdapter = EventAdapter()
         mBinding.eventRecyclerView.apply {
             adapter = eventAdapter
             layoutManager = LinearLayoutManager(activity)
+        }
+    }
+
+    private fun setOnItemClickListener() {
+        eventAdapter.setOnItemClickListener {
+            val bundle = bundleOf("event" to it)
+            fragmentNavigator.navigateMainToDetailsEvent(bundle)
         }
     }
 }

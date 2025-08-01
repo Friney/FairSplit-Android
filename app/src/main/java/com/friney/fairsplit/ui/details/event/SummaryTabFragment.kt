@@ -13,13 +13,14 @@ import com.friney.fairsplit.databinding.FragmentSummaryTabBinding
 import com.friney.fairsplit.ui.adapter.DebtsAdapter
 import com.friney.fairsplit.ui.adapter.ReceiptsSummaryAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 
 @AndroidEntryPoint
 class SummaryTabFragment : Fragment() {
 
     private var _binding: FragmentSummaryTabBinding? = null
     private val mBinding get() = _binding!!
-    private val viewModel: DetailsEventViewModel by viewModels(ownerProducer = { requireActivity() })
+    private val viewModel: DetailsEventViewModel by viewModels()
     lateinit var debtsAdapter: DebtsAdapter
     lateinit var receiptsAdapter: ReceiptsSummaryAdapter
 
@@ -59,7 +60,8 @@ class SummaryTabFragment : Fragment() {
                 is DataState.Success -> {
                     mBinding.progressBar.visibility = View.INVISIBLE
                     response.data?.let { summary ->
-                        mBinding.totalAmount.text = summary.total.toString()
+                        mBinding.totalAmount.text =
+                            String.format(Locale.getDefault(), "%.2f", summary.total)
                         debtsAdapter.differ.submitList(summary.debts)
                         receiptsAdapter.differ.submitList(summary.receipts)
                     }

@@ -43,6 +43,14 @@ class FragmentNavigatorImpl @Inject constructor() : FragmentNavigator {
         )
     }
 
+    override fun navigateToCreateReceipt(bundle: Bundle) {
+        Log.i("FragmentNavigator", "Navigating to create receipt")
+        navController?.navigate(
+            R.id.action_detailsEventFragment_to_createReceiptFragment,
+            bundle
+        )
+    }
+
     override fun navigateBack() {
         Log.i("FragmentNavigator", "Navigating back")
         navController?.navigateUp()

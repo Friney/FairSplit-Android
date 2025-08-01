@@ -5,26 +5,25 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.friney.fairsplit.databinding.ItemExpenseBinding
-import com.friney.fairsplit.network.model.expense.Expense
-import java.text.DecimalFormat
+import com.friney.fairsplit.databinding.ItemUserBinding
+import com.friney.fairsplit.network.model.user.User
 
-class ExpenseAdapter : RecyclerView.Adapter<ExpenseAdapter.FairSplitViewHolder>() {
+class UsersAdapter : RecyclerView.Adapter<UsersAdapter.UserViewHolder>() {
 
-    inner class FairSplitViewHolder(val binding: ItemExpenseBinding) :
+    inner class UserViewHolder(val binding: ItemUserBinding) :
         RecyclerView.ViewHolder(binding.root)
 
-    private val callback = object : DiffUtil.ItemCallback<Expense>() {
+    private val callback = object : DiffUtil.ItemCallback<User>() {
         override fun areItemsTheSame(
-            oldItem: Expense,
-            newItem: Expense
+            oldItem: User,
+            newItem: User
         ): Boolean {
             return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(
-            oldItem: Expense,
-            newItem: Expense
+            oldItem: User,
+            newItem: User
         ): Boolean {
             return oldItem == newItem
         }
@@ -35,9 +34,9 @@ class ExpenseAdapter : RecyclerView.Adapter<ExpenseAdapter.FairSplitViewHolder>(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): FairSplitViewHolder {
-        return FairSplitViewHolder(
-            ItemExpenseBinding.inflate(
+    ): UserViewHolder {
+        return UserViewHolder(
+            ItemUserBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -46,15 +45,14 @@ class ExpenseAdapter : RecyclerView.Adapter<ExpenseAdapter.FairSplitViewHolder>(
     }
 
     override fun onBindViewHolder(
-        holder: FairSplitViewHolder,
+        holder: UserViewHolder,
         position: Int
     ) {
-        val expense = differ.currentList[position]
+        val user = differ.currentList[position]
         holder.binding.apply {
-            expenseName.text = expense.name
-            expensePrice.text = DecimalFormat("#,##0.00").format(expense.amount)
+            userName.text = user.displayName
             root.setOnClickListener {
-                onItemClickListener?.let { it(expense) }
+                onItemClickListener?.let { it(user) }
             }
         }
     }
@@ -63,9 +61,9 @@ class ExpenseAdapter : RecyclerView.Adapter<ExpenseAdapter.FairSplitViewHolder>(
         return differ.currentList.size
     }
 
-    private var onItemClickListener: ((Expense) -> Unit)? = null
+    private var onItemClickListener: ((User) -> Unit)? = null
 
-    fun setOnItemClickListener(listener: (Expense) -> Unit) {
+    fun setOnItemClickListener(listener: (User) -> Unit) {
         onItemClickListener = listener
     }
 } 

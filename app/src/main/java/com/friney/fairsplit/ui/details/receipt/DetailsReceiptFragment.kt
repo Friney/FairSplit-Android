@@ -65,6 +65,16 @@ class DetailsReceiptFragment : Fragment() {
             showPopupMenu(view)
         }
 
+        // Кнопка добавления покупки
+        mBinding.addExpenseButton.setOnClickListener {
+            val receiptId = bundleArgs.receipt.id
+            val bundle = bundleOf("receiptId" to receiptId)
+            findNavController().navigate(
+                R.id.action_detailsReceiptFragment_to_createExpenseFragment,
+                bundle
+            )
+        }
+
         expenseAdapter.setOnItemClickListener {
             val bundle = bundleOf("expense" to it)
             view.findNavController().navigate(
@@ -94,6 +104,8 @@ class DetailsReceiptFragment : Fragment() {
                 }
             }
         }
+
+
 
     }
 

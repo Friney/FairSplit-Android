@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.friney.fairsplit.data.repository.expense.ExpenseRepository
 import com.friney.fairsplit.data.utility.DataState
-import com.friney.fairsplit.network.model.Expense
+import com.friney.fairsplit.network.model.expense.Expense
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.json.JSONObject

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.friney.fairsplit.data.repository.auth.AuthRepository
 import com.friney.fairsplit.data.utility.DataState
-import com.friney.fairsplit.network.model.RegisteredUser
+import com.friney.fairsplit.network.model.user.RegisteredUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.json.JSONObject

@@ -15,6 +15,8 @@ interface FragmentNavigator {
 
     fun navigateMainToDetailsReceipt(bundle: Bundle)
 
+    fun navigateToCreateReceipt(bundle: Bundle)
+
     fun navigateBack()
 
     fun navigateToRegister()

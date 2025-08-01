@@ -1,4 +1,4 @@
-package com.friney.fairsplit.network.model
+package com.friney.fairsplit.network.model.user
 
 data class CreateRegisteredUser(
     val name: String,

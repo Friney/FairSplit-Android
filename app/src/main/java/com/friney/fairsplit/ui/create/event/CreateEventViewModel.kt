@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.friney.fairsplit.data.repository.event.EventRepository
 import com.friney.fairsplit.data.utility.DataState
-import com.friney.fairsplit.network.model.Event
-import com.friney.fairsplit.network.model.EventCreate
+import com.friney.fairsplit.network.model.event.Event
+import com.friney.fairsplit.network.model.event.EventCreate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -27,24 +27,22 @@ class CreateEventViewModel @Inject constructor(
 
         viewModelScope.launch {
             createEventState.value = DataState.Loading()
-            eventRepository.create(EventCreate(name, description))
-                .let {
-                    if (it.isSuccessful) {
-                        it
-                    } else {
-                        val errorBody = it.errorBody()?.string()
-                        val errorMessage = if (!errorBody.isNullOrEmpty()) {
-                            try {
-                                JSONObject(errorBody).getString("message")
-                            } catch (e: Exception) {
-                                "Parse error: ${e.message}"
-                            }
-                        } else {
-                            "Empty error body (HTTP ${it.code()})"
-                        }
-                        createEventState.value = DataState.Error(errorMessage)
+            val response = eventRepository.create(EventCreate(name, description))
+            if (response.isSuccessful) {
+                createEventState.value = DataState.Success(response.body()!!)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val errorMessage = if (!errorBody.isNullOrEmpty()) {
+                    try {
+                        JSONObject(errorBody).getString("message")
+                    } catch (e: Exception) {
+                        "Parse error: ${e.message}"
                     }
+                } else {
+                    "Empty error body (HTTP ${response.code()})"
                 }
+                createEventState.value = DataState.Error(errorMessage)
+            }
         }
     }
 }

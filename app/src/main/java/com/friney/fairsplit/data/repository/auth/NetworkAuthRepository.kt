@@ -1,11 +1,11 @@
 package com.friney.fairsplit.data.repository.auth
 
 import com.friney.fairsplit.data.utility.TokenManager
-import com.friney.fairsplit.network.model.CreateRegisteredUser
-import com.friney.fairsplit.network.model.JwtAuthentication
-import com.friney.fairsplit.network.model.RefreshToken
-import com.friney.fairsplit.network.model.RegisteredUser
-import com.friney.fairsplit.network.model.UserCredentials
+import com.friney.fairsplit.network.model.token.JwtAuthentication
+import com.friney.fairsplit.network.model.token.RefreshToken
+import com.friney.fairsplit.network.model.user.CreateRegisteredUser
+import com.friney.fairsplit.network.model.user.RegisteredUser
+import com.friney.fairsplit.network.model.user.UserCredentials
 import com.friney.fairsplit.network.service.AuthService
 import retrofit2.Response
 import javax.inject.Inject

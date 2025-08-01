@@ -1,5 +1,6 @@
 package com.friney.fairsplit.data.repository.expense
 
+import com.friney.fairsplit.network.model.expense.ExpenseCreate
 import com.friney.fairsplit.network.service.ExpenseService
 import javax.inject.Inject
 
@@ -8,4 +9,9 @@ class NetworkExpenseRepository @Inject constructor(private val expenseService: E
 
     override suspend fun getAllByReceiptId(receiptId: Long) =
         expenseService.getAllByReceiptId(receiptId)
+
+    override suspend fun create(
+        create: ExpenseCreate,
+        receiptId: Long
+    ) = expenseService.create(create, receiptId)
 }

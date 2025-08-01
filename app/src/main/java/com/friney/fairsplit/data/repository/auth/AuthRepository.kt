@@ -1,7 +1,7 @@
 package com.friney.fairsplit.data.repository.auth
 
-import com.friney.fairsplit.network.model.JwtAuthentication
-import com.friney.fairsplit.network.model.RegisteredUser
+import com.friney.fairsplit.network.model.token.JwtAuthentication
+import com.friney.fairsplit.network.model.user.RegisteredUser
 import retrofit2.Response
 
 interface AuthRepository {

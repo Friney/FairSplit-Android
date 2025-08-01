@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.friney.fairsplit.databinding.ItemEventBinding
-import com.friney.fairsplit.network.model.Event
+import com.friney.fairsplit.network.model.event.Event
 
 class EventAdapter : RecyclerView.Adapter<EventAdapter.FairSplitViewHolder>() {
 

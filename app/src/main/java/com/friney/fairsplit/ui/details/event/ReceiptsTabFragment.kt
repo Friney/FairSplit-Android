@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.databinding.FragmentReceiptsTabBinding
@@ -24,7 +24,8 @@ class ReceiptsTabFragment : Fragment() {
 
     private var _binding: FragmentReceiptsTabBinding? = null
     private val mBinding get() = _binding!!
-    private val viewModel: DetailsEventViewModel by viewModels(ownerProducer = { requireActivity() })
+
+    private val viewModel: DetailsEventViewModel by activityViewModels()
     lateinit var receiptAdapter: ReceiptsAdapter
 
     override fun onCreateView(
@@ -43,6 +44,16 @@ class ReceiptsTabFragment : Fragment() {
         receiptAdapter.setOnItemClickListener {
             val bundle = bundleOf("receipt" to it)
             fragmentNavigator.navigateMainToDetailsReceipt(bundle)
+        }
+
+        Log.i("EvintId", viewModel.getEventId().toString())
+        // Кнопка создания чека
+        mBinding.addReceiptButton.setOnClickListener {
+            Log.i("ReceiptTab", "Create receipt button clicked")
+            // Получаем eventId из DetailsEventViewModel
+            val eventId = viewModel.getEventId()
+            val bundle = bundleOf("eventId" to eventId)
+            fragmentNavigator.navigateToCreateReceipt(bundle)
         }
 
         viewModel.receiptsLiveData.observe(viewLifecycleOwner) { response ->

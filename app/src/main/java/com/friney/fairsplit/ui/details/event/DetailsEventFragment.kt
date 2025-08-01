@@ -7,12 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
-import androidx.viewpager2.widget.ViewPager2
 import com.friney.fairsplit.R
+import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.databinding.FragmentDetailsEventBinding
 import com.friney.fairsplit.ui.navigation.FragmentNavigator
 import com.google.android.material.tabs.TabLayoutMediator
@@ -28,7 +30,7 @@ class DetailsEventFragment : Fragment() {
     private var _binding: FragmentDetailsEventBinding? = null
     private val mBinding get() = _binding!!
     private val bundleArgs: DetailsEventFragmentArgs by navArgs()
-    private val viewModel: DetailsEventViewModel by viewModels(ownerProducer = { requireActivity() })
+    private val viewModel: DetailsEventViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,6 +60,27 @@ class DetailsEventFragment : Fragment() {
             showPopupMenu(view)
         }
 
+        viewModel.deleteEventLiveData.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is DataState.Loading -> {
+                    mBinding.deleteProgressBar.visibility = View.VISIBLE
+                }
+
+                is DataState.Success -> {
+                    mBinding.deleteProgressBar.visibility = View.GONE
+                    fragmentNavigator.navigateBack()
+                }
+
+                is DataState.Error -> {
+                    mBinding.deleteProgressBar.visibility = View.GONE
+                    Toast.makeText(
+                        context,
+                        state.message ?: "Неизвестная ошибка",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
     }
 
     private fun setupViewPager() {
@@ -70,15 +93,6 @@ class DetailsEventFragment : Fragment() {
                 ?: throw IllegalArgumentException("Invalid position $position")
         }.attach()
 
-        mBinding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                mBinding.addReceiptButton.visibility = when (position) {
-                    1 -> View.INVISIBLE
-                    else -> View.VISIBLE
-                }
-            }
-        })
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -96,7 +110,7 @@ class DetailsEventFragment : Fragment() {
                 }
 
                 R.id.menu_delete -> {
-                    // Действие при удалении
+                    showDeleteConfirmationDialog()
                     true
                 }
 
@@ -105,5 +119,16 @@ class DetailsEventFragment : Fragment() {
         }
 
         popup.show()
+    }
+
+    private fun showDeleteConfirmationDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Удаление события")
+            .setMessage("Вы точно уверены, что хотите удалить это событие? Это действие нельзя отменить.")
+            .setPositiveButton("Удалить") { _, _ ->
+                viewModel.deleteEvent()
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
     }
 }

@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.friney.fairsplit.databinding.ItemExpenseMemberBinding
-import com.friney.fairsplit.network.model.ExpenseMember
+import com.friney.fairsplit.network.model.expense.member.ExpenseMember
 import java.math.BigDecimal
 import java.text.DecimalFormat
 
@@ -37,6 +37,7 @@ class ExpenseMemberAdapter : RecyclerView.Adapter<ExpenseMemberAdapter.FairSplit
 
     fun setAmountByOnePerson(amountByOnePerson: BigDecimal) {
         _amountByOnePerson = amountByOnePerson
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(
@@ -60,8 +61,14 @@ class ExpenseMemberAdapter : RecyclerView.Adapter<ExpenseMemberAdapter.FairSplit
         holder.binding.apply {
             memberName.text = expense.user.name
             memberAmount.text = DecimalFormat("#,##0.00").format(_amountByOnePerson)
+            
             root.setOnClickListener {
                 onItemClickListener?.let { it(expense) }
+            }
+            
+            root.setOnLongClickListener {
+                onItemLongClickListener?.let { it(expense) }
+                true
             }
         }
     }
@@ -71,8 +78,13 @@ class ExpenseMemberAdapter : RecyclerView.Adapter<ExpenseMemberAdapter.FairSplit
     }
 
     private var onItemClickListener: ((ExpenseMember) -> Unit)? = null
+    private var onItemLongClickListener: ((ExpenseMember) -> Unit)? = null
 
     fun setOnItemClickListener(listener: (ExpenseMember) -> Unit) {
         onItemClickListener = listener
+    }
+
+    fun setOnItemLongClickListener(listener: (ExpenseMember) -> Unit) {
+        onItemLongClickListener = listener
     }
 } 

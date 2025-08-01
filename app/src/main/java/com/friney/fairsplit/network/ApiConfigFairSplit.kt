@@ -19,6 +19,7 @@ class ApiConfigFairSplit {
         const val EXPENSES = "$RECEIPTS_ID/expenses"
         const val EXPENSES_ID = "$API_V1/expenses/{expenseId}"
         const val EXPENSES_MEMBERS = "$EXPENSES_ID/members"
+        const val EXPENSE_MEMBER_BY_ID = "$EXPENSES_MEMBERS/{expenseMemberId}"
         const val SUMMARY = "$EVENTS_ID/summary"
     }
 }

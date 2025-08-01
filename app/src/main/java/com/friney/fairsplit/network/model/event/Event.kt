@@ -1,5 +1,6 @@
-package com.friney.fairsplit.network.model
+package com.friney.fairsplit.network.model.event
 
+import com.friney.fairsplit.network.model.receipt.Receipt
 import java.io.Serializable
 
 data class Event(
