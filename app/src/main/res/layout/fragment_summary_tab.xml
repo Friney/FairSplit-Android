@@ -11,11 +11,21 @@
             android:layout_height="wrap_content"
             android:padding="16dp">
 
+        <Button
+                android:id="@+id/btn_save_pdf"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Сохранить в PDF"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp" />
+
         <TextView
                 android:id="@+id/total_amount_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Общая сумма:"
+                android:text="@string/total_amount"
                 android:textSize="26sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -35,6 +45,7 @@
                     android:id="@+id/total_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="0"
                     android:textSize="26sp"
                     tools:text="1395.28" />
 
@@ -56,7 +67,10 @@
                 android:text="Кто кому должен:"
                 android:textSize="26sp"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/summary_card_margin"
+                app:autoSizeTextType="uniform"
+                app:autoSizeMinTextSize="14sp"
+                app:autoSizeMaxTextSize="32sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/total_amount_container" />
 
@@ -75,7 +89,7 @@
                 android:text="Чеки:"
                 android:textSize="26sp"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/summary_card_margin"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/debts_recycler_view" />
 

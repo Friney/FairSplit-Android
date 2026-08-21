@@ -4,8 +4,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.friney.fairsplit.data.repository.expense.ExpenseRepository
+import com.friney.fairsplit.data.repository.receipt.ReceiptRepository
+import com.friney.fairsplit.data.repository.user.UserRepository
 import com.friney.fairsplit.data.utility.DataState
-import com.friney.fairsplit.network.model.Expense
+import com.friney.fairsplit.network.model.expense.Expense
+import com.friney.fairsplit.network.model.receipt.Receipt
+import com.friney.fairsplit.network.model.user.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -13,15 +17,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailsReceiptViewModel @Inject constructor(
-    private val expenseRepository: ExpenseRepository
+    private val receiptRepository: ReceiptRepository,
+    private val expenseRepository: ExpenseRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     val expensesLiveData = MutableLiveData<DataState<List<Expense>>>()
+    val deletesReceiptLiveData = MutableLiveData<DataState<Boolean>>()
+    val allUsersLiveData = MutableLiveData<DataState<List<User>>>()
+    val updateReceiptLiveData = MutableLiveData<DataState<Receipt>>()
     private var _receiptId: Long? = null
+    private var _eventId: Long? = null
 
-    fun init(receiptId: Long) {
+    fun init(receiptId: Long, eventId: Long) {
         _receiptId = receiptId
+        _eventId = eventId
         getAllExpenses()
+        getAllUsers()
     }
 
     private fun getAllExpenses() = viewModelScope.launch {
@@ -46,4 +58,38 @@ class DetailsReceiptViewModel @Inject constructor(
             }
         }
     }
-} 
+
+    fun deleteReceipt() = viewModelScope.launch {
+        _eventId?.let { eventId ->
+            _receiptId?.let { receiptId ->
+                deletesReceiptLiveData.postValue(DataState.Loading())
+                try {
+                    receiptRepository.delete(receiptId, eventId)
+                    deletesReceiptLiveData.postValue(DataState.Success(true))
+                } catch (e: Exception) {
+                    deletesReceiptLiveData.postValue(DataState.Error("Ошибка при удалении чека: ${e.message}"))
+                }
+            }
+        }
+    }
+
+    private fun getAllUsers() = viewModelScope.launch {
+        allUsersLiveData.postValue(DataState.Loading())
+        val response = userRepository.getAllUser()
+        if (response.isSuccessful) {
+            allUsersLiveData.postValue(DataState.Success(response.body() as List<User>))
+        } else {
+            val errorBody = response.errorBody()?.string()
+            val errorMessage = if (!errorBody.isNullOrEmpty()) {
+                try {
+                    JSONObject(errorBody).getString("message")
+                } catch (e: Exception) {
+                    "Parse error: ${e.message}"
+                }
+            } else {
+                "Empty error body (HTTP ${response.code()})"
+            }
+            allUsersLiveData.postValue(DataState.Error(errorMessage))
+        }
+    }
+}

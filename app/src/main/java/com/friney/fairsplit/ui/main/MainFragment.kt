@@ -7,21 +7,28 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.friney.fairsplit.R
 import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.databinding.FragmentMainBinding
 import com.friney.fairsplit.ui.adapter.EventAdapter
+import com.friney.fairsplit.ui.auth.AuthViewModel
+import com.friney.fairsplit.ui.navigation.FragmentNavigator
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
+    @Inject
+    lateinit var fragmentNavigator: FragmentNavigator
+
     private var _binding: FragmentMainBinding? = null
     private val mBinding get() = _binding!!
-    private val viewModel by viewModels<MainViewModel>()
+    private val viewModel by activityViewModels<MainViewModel>()
+    private val authViewModel by viewModels<AuthViewModel>()
     lateinit var eventAdapter: EventAdapter
 
     override fun onCreateView(
@@ -34,14 +41,21 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initAdapter()
 
-        eventAdapter.setOnItemClickListener {
-            val bundle = bundleOf("event" to it)
-            view.findNavController().navigate(
-                R.id.action_mainFragment_to_detailsEventFragment,
-                bundle
-            )
+        fragmentNavigator.setNavController(findNavController())
+
+        val isLogin = authViewModel.isLoggedIn()
+        Log.i("isLogin", isLogin.toString())
+        if (!isLogin) {
+            fragmentNavigator.navigateToLogin()
+            return
+        }
+
+        initAdapter()
+        setOnItemClickListener()
+
+        mBinding.addEventButton.setOnClickListener {
+            fragmentNavigator.navigateMainToCreateEvent()
         }
 
         viewModel.eventLiveData.observe(viewLifecycleOwner) { response ->
@@ -68,11 +82,23 @@ class MainFragment : Fragment() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshEvents()
+    }
+
     private fun initAdapter() {
         eventAdapter = EventAdapter()
         mBinding.eventRecyclerView.apply {
             adapter = eventAdapter
             layoutManager = LinearLayoutManager(activity)
+        }
+    }
+
+    private fun setOnItemClickListener() {
+        eventAdapter.setOnItemClickListener {
+            val bundle = bundleOf("event" to it)
+            fragmentNavigator.navigateMainToDetailsEvent(bundle)
         }
     }
 }

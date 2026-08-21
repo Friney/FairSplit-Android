@@ -14,4 +14,10 @@
     <string name="edit">Редактировать</string>
     <string name="ruble_symbol">₽</string>
     <string name="paid_by">Оплатил: %1$s</string>
+    <string name="total_amount">Общая сумма:</string>
+    <string name="scale_label">Масштаб интерфейса</string>
+    <string name="scale_small">Маленький</string>
+    <string name="scale_normal">Обычный</string>
+    <string name="scale_large">Крупный</string>
+    <string name="scale_xlarge">Очень крупный</string>
 </resources>

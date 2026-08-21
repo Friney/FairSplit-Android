@@ -14,7 +14,11 @@ import com.friney.fairsplit.data.repository.summary.NetworkSummaryRepository
 import com.friney.fairsplit.data.repository.summary.SummaryRepository
 import com.friney.fairsplit.data.repository.user.NetworkUserRepository
 import com.friney.fairsplit.data.repository.user.UserRepository
+import com.friney.fairsplit.data.utility.TokenManager
 import com.friney.fairsplit.network.ApiConfigFairSplit
+import com.friney.fairsplit.network.interceptor.AuthInterceptor
+import com.friney.fairsplit.network.refresher.TokenRefresher
+import com.friney.fairsplit.network.refresher.TokenRefresherImpl
 import com.friney.fairsplit.network.service.AuthService
 import com.friney.fairsplit.network.service.EventService
 import com.friney.fairsplit.network.service.ExpenseMemberService
@@ -22,6 +26,8 @@ import com.friney.fairsplit.network.service.ExpenseService
 import com.friney.fairsplit.network.service.ReceiptService
 import com.friney.fairsplit.network.service.SummaryService
 import com.friney.fairsplit.network.service.UserService
+import com.friney.fairsplit.ui.navigation.FragmentNavigator
+import com.friney.fairsplit.ui.navigation.FragmentNavigatorImpl
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
@@ -35,6 +41,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.math.BigDecimal
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Module
@@ -64,8 +71,28 @@ class AppModule {
         .setLevel(HttpLoggingInterceptor.Level.BODY)
 
     @Provides
-    fun okHttpClient() = OkHttpClient.Builder()
+    @Singleton
+    fun provideTokenRefresher(
+        tokenManager: TokenManager,
+        authRepository: Provider<AuthRepository>
+    ): TokenRefresher = TokenRefresherImpl(tokenManager, authRepository)
+
+    @Provides
+    @Singleton
+    fun provideAuthNavigator(): FragmentNavigator = FragmentNavigatorImpl()
+
+    @Provides
+    @Singleton
+    fun provideAuthInterceptor(
+        tokenManager: TokenManager,
+        tokenRefresher: TokenRefresher,
+        fragmentNavigator: FragmentNavigator
+    ): AuthInterceptor = AuthInterceptor(tokenManager, tokenRefresher, fragmentNavigator)
+
+    @Provides
+    fun okHttpClient(authInterceptor: AuthInterceptor) = OkHttpClient.Builder()
         .addInterceptor(logging())
+        .addInterceptor(authInterceptor)
         .build()
 
     @Provides
@@ -126,8 +153,11 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(authService: AuthService): AuthRepository =
-        NetworkAuthRepository(authService)
+    fun provideAuthRepository(
+        authService: AuthService,
+        tokenManager: TokenManager
+    ): AuthRepository =
+        NetworkAuthRepository(authService, tokenManager)
 
     @Provides
     @Singleton

@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="tab_item_padding">16dp</dimen>
+    <dimen name="summary_card_margin">16dp</dimen>
+</resources>
+
