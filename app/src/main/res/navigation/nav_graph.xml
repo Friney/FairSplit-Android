@@ -63,6 +63,9 @@
         <action
                 android:id="@+id/action_detailsReceiptFragment_to_createExpenseFragment"
                 app:destination="@id/createExpenseFragment" />
+        <argument
+                android:name="eventId"
+                app:argType="long" />
     </fragment>
     <fragment
             android:id="@+id/detailsExpenseFragment"
@@ -72,6 +75,9 @@
         <argument
                 android:name="expense"
                 app:argType="com.friney.fairsplit.network.model.expense.Expense" />
+        <argument
+                android:name="receiptId"
+                app:argType="long" />
     </fragment>
     <fragment
             android:id="@+id/createEventFragment"

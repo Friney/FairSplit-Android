@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.databinding.FragmentReceiptsTabBinding
@@ -41,16 +42,15 @@ class ReceiptsTabFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initAdapter()
 
+        fragmentNavigator.setNavController(findNavController())
+
         receiptAdapter.setOnItemClickListener {
-            val bundle = bundleOf("receipt" to it)
+            val eventId = viewModel.getEventId()
+            val bundle = bundleOf("receipt" to it, "eventId" to eventId)
             fragmentNavigator.navigateMainToDetailsReceipt(bundle)
         }
 
-        Log.i("EvintId", viewModel.getEventId().toString())
-        // Кнопка создания чека
         mBinding.addReceiptButton.setOnClickListener {
-            Log.i("ReceiptTab", "Create receipt button clicked")
-            // Получаем eventId из DetailsEventViewModel
             val eventId = viewModel.getEventId()
             val bundle = bundleOf("eventId" to eventId)
             fragmentNavigator.navigateToCreateReceipt(bundle)

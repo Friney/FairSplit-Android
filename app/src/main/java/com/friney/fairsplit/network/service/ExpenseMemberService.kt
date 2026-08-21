@@ -23,16 +23,16 @@ interface ExpenseMemberService {
         @Path("expenseId") expenseId: Long
     ): Response<ExpenseMember>
 
+    @PATCH(ApiConfigFairSplit.EXPENSE_MEMBER_BY_ID)
+    suspend fun update(
+        @Body update: ExpenseMemberUpdate,
+        @Path("expenseMemberId") expenseMemberId: Long,
+        @Path("expenseId") expenseId: Long
+    ): Response<ExpenseMember>
+
     @DELETE(ApiConfigFairSplit.EXPENSE_MEMBER_BY_ID)
     suspend fun delete(
         @Path("expenseMemberId") expenseMemberId: Long,
         @Path("expenseId") expenseId: Long
     )
-
-    @PATCH(ApiConfigFairSplit.EXPENSE_MEMBER_BY_ID)
-    suspend fun update(
-        @Path("expenseMemberId") expenseMemberId: Long,
-        @Path("expenseId") expenseId: Long,
-        @Body update: ExpenseMemberUpdate
-    ): Response<ExpenseMember>
 }

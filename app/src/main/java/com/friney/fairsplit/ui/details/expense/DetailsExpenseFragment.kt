@@ -12,8 +12,10 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.friney.fairsplit.R
@@ -58,11 +60,14 @@ class DetailsExpenseFragment : Fragment() {
         initAdapter()
         initUsersAdapter()
 
+        fragmentNavigator.setNavController(findNavController())
+
         val expenseArg = bundleArgs.expense
+        val receiptId = bundleArgs.receiptId
         expenseArg.let { expense ->
             mBinding.expenseName.text = expense.name
             mBinding.expensePrice.text = DecimalFormat("#,##0.00").format(expense.amount)
-            viewModel.init(expense.id)
+            viewModel.init(expense.id, receiptId)
         }
 
         mBinding.backButton.setOnClickListener {
@@ -73,7 +78,6 @@ class DetailsExpenseFragment : Fragment() {
             showPopupMenu(view)
         }
 
-        // --- ADD MEMBER BUTTON LOGIC ---
         mBinding.addMemberButton.setOnClickListener {
             mBinding.usersOverlay.visibility = View.VISIBLE
             mBinding.addMemberButton.visibility = View.GONE
@@ -81,7 +85,6 @@ class DetailsExpenseFragment : Fragment() {
             usersAdapter.differ.submitList(allUsers)
         }
 
-        // --- USERS OVERLAY LOGIC ---
         mBinding.closeUsersOverlay.setOnClickListener {
             mBinding.usersOverlay.visibility = View.GONE
             mBinding.addMemberButton.visibility = View.VISIBLE
@@ -99,26 +102,24 @@ class DetailsExpenseFragment : Fragment() {
                 val filtered = allUsers.filter { it.displayName.lowercase().contains(query) }
                 usersAdapter.differ.submitList(filtered)
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
 
         usersAdapter.setOnItemClickListener { user ->
             viewModel.selectUser(user.id)
-            
+
             if (currentEditingExpenseMemberId != null) {
-                // Редактирование существующего участника
                 viewModel.updateExpenseMember(currentEditingExpenseMemberId!!, user.id)
                 currentEditingExpenseMemberId = null
             } else {
-                // Создание нового участника
                 viewModel.createExpenseMember()
             }
-            
+
             mBinding.usersOverlay.visibility = View.GONE
             mBinding.addMemberButton.visibility = View.VISIBLE
         }
 
-        // --- CREATE USER DIALOG LOGIC ---
         mBinding.cancelCreateUser.setOnClickListener {
             mBinding.createUserDialog.visibility = View.GONE
         }
@@ -127,17 +128,37 @@ class DetailsExpenseFragment : Fragment() {
             val userName = mBinding.newUserNameInput.text.toString()
             viewModel.createUser(userName)
         }
-        // --- END CREATE USER DIALOG LOGIC ---
-        // --- END USERS OVERLAY LOGIC ---
+
+        viewModel.deletesExpenseLiveData.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is DataState.Loading -> {
+                    mBinding.progressBar.visibility = View.VISIBLE
+                }
+
+                is DataState.Success -> {
+                    mBinding.progressBar.visibility = View.GONE
+                    fragmentNavigator.navigateBack()
+                }
+
+                is DataState.Error -> {
+                    mBinding.progressBar.visibility = View.GONE
+                    Toast.makeText(
+                        context,
+                        state.message ?: "Неизвестная ошибка",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
 
         viewModel.expenseMembersLiveData.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is DataState.Success -> {
                     mBinding.progressBar.visibility = View.INVISIBLE
                     response.data?.let { expenseMembers ->
-                        // Пересчитываем сумму на каждого участника
                         val size = if (expenseMembers.isEmpty()) 1 else expenseMembers.size
-                        val amountByOnePerson = bundleArgs.expense.amount.divide(BigDecimal(size), 2)
+                        val amountByOnePerson =
+                            bundleArgs.expense.amount.divide(BigDecimal(size), 2)
                         expenseMemberAdapter.setAmountByOnePerson(amountByOnePerson)
                         expenseMemberAdapter.differ.submitList(expenseMembers)
                     }
@@ -156,15 +177,16 @@ class DetailsExpenseFragment : Fragment() {
             }
         }
 
-        // Наблюдатель за списком пользователей
-        viewModel.allUsersState.observe(viewLifecycleOwner) { state ->
+        viewModel.allUsersLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is DataState.Success -> {
+                    mBinding.progressBar.visibility = View.INVISIBLE
                     allUsers = state.data ?: emptyList()
                     usersAdapter.differ.submitList(allUsers)
                 }
 
                 is DataState.Error -> {
+                    mBinding.progressBar.visibility = View.INVISIBLE
                     Toast.makeText(
                         context,
                         "Ошибка загрузки пользователей: ${state.message}",
@@ -173,12 +195,12 @@ class DetailsExpenseFragment : Fragment() {
                 }
 
                 is DataState.Loading -> {
+                    mBinding.progressBar.visibility = View.VISIBLE
                 }
             }
         }
 
-        // Наблюдатель за созданием пользователя
-        viewModel.createUserState.observe(viewLifecycleOwner) { state ->
+        viewModel.createUserLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is DataState.Success -> {
                     mBinding.createUserProgressBar.visibility = View.INVISIBLE
@@ -208,10 +230,10 @@ class DetailsExpenseFragment : Fragment() {
             }
         }
 
-        // Наблюдатель за созданием участника расхода
-        viewModel.createExpenseMemberState.observe(viewLifecycleOwner) { state ->
+        viewModel.createExpenseMemberLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is DataState.Success -> {
+                    mBinding.progressBar.visibility = View.INVISIBLE
                     Toast.makeText(
                         context,
                         "Участник успешно добавлен!",
@@ -220,6 +242,7 @@ class DetailsExpenseFragment : Fragment() {
                 }
 
                 is DataState.Error -> {
+                    mBinding.progressBar.visibility = View.INVISIBLE
                     Toast.makeText(
                         context,
                         state.message ?: "Неизвестная ошибка",
@@ -228,15 +251,15 @@ class DetailsExpenseFragment : Fragment() {
                 }
 
                 is DataState.Loading -> {
-                    // Можно показать прогресс
+                    mBinding.progressBar.visibility = View.VISIBLE
                 }
             }
         }
 
-        // Наблюдатель за удалением участника расхода
-        viewModel.deleteExpenseMemberState.observe(viewLifecycleOwner) { state ->
+        viewModel.deleteExpenseMemberLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is DataState.Success -> {
+                    mBinding.progressBar.visibility = View.INVISIBLE
                     Toast.makeText(
                         context,
                         "Участник успешно удален!",
@@ -245,6 +268,7 @@ class DetailsExpenseFragment : Fragment() {
                 }
 
                 is DataState.Error -> {
+                    mBinding.progressBar.visibility = View.INVISIBLE
                     Toast.makeText(
                         context,
                         state.message ?: "Неизвестная ошибка",
@@ -253,15 +277,15 @@ class DetailsExpenseFragment : Fragment() {
                 }
 
                 is DataState.Loading -> {
-                    // Можно показать прогресс
+                    mBinding.progressBar.visibility = View.VISIBLE
                 }
             }
         }
 
-        // Наблюдатель за обновлением участника расхода
-        viewModel.updateExpenseMemberState.observe(viewLifecycleOwner) { state ->
+        viewModel.updateExpenseMemberLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is DataState.Success -> {
+                    mBinding.progressBar.visibility = View.INVISIBLE
                     Toast.makeText(
                         context,
                         "Участник успешно обновлен!",
@@ -270,6 +294,7 @@ class DetailsExpenseFragment : Fragment() {
                 }
 
                 is DataState.Error -> {
+                    mBinding.progressBar.visibility = View.INVISIBLE
                     Toast.makeText(
                         context,
                         state.message ?: "Неизвестная ошибка",
@@ -278,20 +303,20 @@ class DetailsExpenseFragment : Fragment() {
                 }
 
                 is DataState.Loading -> {
-                    // Можно показать прогресс
+                    mBinding.progressBar.visibility = View.VISIBLE
                 }
             }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun initAdapter() {
         expenseMemberAdapter = ExpenseMemberAdapter()
         mBinding.membersRecyclerView.apply {
             adapter = expenseMemberAdapter
             layoutManager = LinearLayoutManager(activity)
         }
-        
-        // Добавляем обработчик долгого нажатия
+
         expenseMemberAdapter.setOnItemLongClickListener { expenseMember ->
             showExpenseMemberContextMenu(expenseMember)
         }
@@ -320,7 +345,7 @@ class DetailsExpenseFragment : Fragment() {
                 }
 
                 R.id.menu_delete -> {
-                    // Действие при удалении
+                    showDeleteConfirmationDialog()
                     true
                 }
 
@@ -331,14 +356,13 @@ class DetailsExpenseFragment : Fragment() {
         popup.show()
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun showExpenseMemberContextMenu(expenseMember: ExpenseMember) {
-        // Находим позицию элемента в RecyclerView
         val position = expenseMemberAdapter.differ.currentList.indexOf(expenseMember)
         if (position == -1) return
-        
-        val layoutManager = mBinding.membersRecyclerView.layoutManager as LinearLayoutManager
+
         val viewHolder = mBinding.membersRecyclerView.findViewHolderForAdapterPosition(position)
-        
+
         if (viewHolder != null) {
             val itemView = viewHolder.itemView
             val popup = PopupMenu(requireContext(), itemView, Gravity.BOTTOM)
@@ -349,19 +373,15 @@ class DetailsExpenseFragment : Fragment() {
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.menu_edit -> {
-                        // Открываем overlay для выбора нового пользователя
                         mBinding.usersOverlay.visibility = View.VISIBLE
                         mBinding.addMemberButton.visibility = View.GONE
                         mBinding.userSearch.setText("")
                         usersAdapter.differ.submitList(allUsers)
-                        
-                        // Сохраняем ID участника для обновления
                         currentEditingExpenseMemberId = expenseMember.id
                         true
                     }
 
                     R.id.menu_delete -> {
-                        // Удаляем участника
                         viewModel.deleteExpenseMember(expenseMember.id)
                         true
                     }
@@ -372,5 +392,16 @@ class DetailsExpenseFragment : Fragment() {
 
             popup.show()
         }
+    }
+
+    private fun showDeleteConfirmationDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Удаление покупки")
+            .setMessage("Вы точно уверены, что хотите удалить эту покупку? Это действие нельзя отменить.")
+            .setPositiveButton("Удалить") { _, _ ->
+                viewModel.deleteExpense()
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
     }
 }

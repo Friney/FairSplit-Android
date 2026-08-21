@@ -15,11 +15,14 @@ class NetworkExpenseMemberRepository @Inject constructor(private val expenseMemb
         create: ExpenseMemberCreate,
         expenseId: Long
     ) = expenseMemberService.create(create, expenseId)
-    
-    override suspend fun delete(expenseMemberId: Long, expenseId: Long) {
+
+    override suspend fun update(
+        update: ExpenseMemberUpdate,
+        expenseMemberId: Long,
+        expenseId: Long
+    ) = expenseMemberService.update(update, expenseMemberId, expenseId)
+
+    override suspend fun delete(expenseMemberId: Long, expenseId: Long) =
         expenseMemberService.delete(expenseMemberId, expenseId)
-    }
-    
-    override suspend fun update(expenseMemberId: Long, expenseId: Long, update: ExpenseMemberUpdate) =
-        expenseMemberService.update(expenseMemberId, expenseId, update)
+
 }

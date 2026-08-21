@@ -14,8 +14,8 @@ interface ExpenseMemberRepository {
     suspend fun delete(expenseMemberId: Long, expenseId: Long)
 
     suspend fun update(
+        update: ExpenseMemberUpdate,
         expenseMemberId: Long,
-        expenseId: Long,
-        update: ExpenseMemberUpdate
+        expenseId: Long
     ): Response<ExpenseMember>
 }

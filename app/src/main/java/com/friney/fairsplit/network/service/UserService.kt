@@ -14,5 +14,5 @@ interface UserService {
     suspend fun getAllUser(): Response<List<User>>
 
     @POST(ApiConfigFairSplit.USERS)
-    suspend fun createUser(@Body create: CreateNotRegisteredUser): Response<User>
+    suspend fun create(@Body create: CreateNotRegisteredUser): Response<User>
 }

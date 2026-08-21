@@ -8,5 +8,5 @@ interface UserRepository {
 
     suspend fun getAllUser(): Response<List<User>>
 
-    suspend fun createUser(create: CreateNotRegisteredUser): Response<User>
+    suspend fun create(create: CreateNotRegisteredUser): Response<User>
 }

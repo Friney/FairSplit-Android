@@ -20,9 +20,9 @@ interface EventService {
     @POST(ApiConfigFairSplit.EVENTS)
     suspend fun create(@Body create: EventCreate): Response<Event>
 
-    @PATCH(ApiConfigFairSplit.EVENTS_ID)
-    suspend fun update(@Body update: EventUpdate, @Path("eventId") lng: Long): Response<Event>
+    @PATCH(ApiConfigFairSplit.EVENTS_BY_ID)
+    suspend fun update(@Body update: EventUpdate, @Path("eventId") id: Long): Response<Event>
 
-    @DELETE(ApiConfigFairSplit.EVENTS_ID)
-    suspend fun delete(@Path("eventId") lng: Long)
+    @DELETE(ApiConfigFairSplit.EVENTS_BY_ID)
+    suspend fun delete(@Path("eventId") id: Long)
 }

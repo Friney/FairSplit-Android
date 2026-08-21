@@ -1,5 +1,6 @@
 package com.friney.fairsplit.ui.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -35,6 +36,7 @@ class ExpenseMemberAdapter : RecyclerView.Adapter<ExpenseMemberAdapter.FairSplit
 
     private var _amountByOnePerson: BigDecimal = BigDecimal.ZERO
 
+    @SuppressLint("NotifyDataSetChanged")
     fun setAmountByOnePerson(amountByOnePerson: BigDecimal) {
         _amountByOnePerson = amountByOnePerson
         notifyDataSetChanged()
@@ -59,13 +61,13 @@ class ExpenseMemberAdapter : RecyclerView.Adapter<ExpenseMemberAdapter.FairSplit
     ) {
         val expense = differ.currentList[position]
         holder.binding.apply {
-            memberName.text = expense.user.name
+            memberName.text = expense.user.displayName
             memberAmount.text = DecimalFormat("#,##0.00").format(_amountByOnePerson)
-            
+
             root.setOnClickListener {
                 onItemClickListener?.let { it(expense) }
             }
-            
+
             root.setOnLongClickListener {
                 onItemLongClickListener?.let { it(expense) }
                 true

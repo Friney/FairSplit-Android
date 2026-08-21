@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,10 +7,16 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
     kotlin("kapt")
 }
-
 android {
     namespace = "com.friney.fairsplit"
     compileSdk = 35
+
+    val localPropertiesFile = rootProject.file("secret.properties")
+    val localProperties = Properties().apply {
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use { load(it) }
+        }
+    }
 
     defaultConfig {
         applicationId = "com.friney.fairsplit"
@@ -17,10 +25,16 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField(
+            "String",
+            "FAIR_SPLIT_BASE_URL",
+            localProperties.getProperty("FAIR_SPLIT_BASE_URL")
+        )
     }
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     buildTypes {

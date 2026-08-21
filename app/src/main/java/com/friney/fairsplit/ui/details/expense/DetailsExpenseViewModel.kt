@@ -3,6 +3,7 @@ package com.friney.fairsplit.ui.details.expense
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.friney.fairsplit.data.repository.expense.ExpenseRepository
 import com.friney.fairsplit.data.repository.expense.member.ExpenseMemberRepository
 import com.friney.fairsplit.data.repository.user.UserRepository
 import com.friney.fairsplit.data.utility.DataState
@@ -18,20 +19,24 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailsExpenseViewModel @Inject constructor(
+    private val expenseRepository: ExpenseRepository,
     private val expenseMemberRepository: ExpenseMemberRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
 
     val expenseMembersLiveData = MutableLiveData<DataState<List<ExpenseMember>>>()
-    val allUsersState = MutableLiveData<DataState<List<User>>>()
-    val createUserState = MutableLiveData<DataState<User>>()
-    val createExpenseMemberState = MutableLiveData<DataState<ExpenseMember>>()
-    val deleteExpenseMemberState = MutableLiveData<DataState<Unit>>()
-    val updateExpenseMemberState = MutableLiveData<DataState<ExpenseMember>>()
+    val allUsersLiveData = MutableLiveData<DataState<List<User>>>()
+    val createUserLiveData = MutableLiveData<DataState<User>>()
+    val createExpenseMemberLiveData = MutableLiveData<DataState<ExpenseMember>>()
+    val deleteExpenseMemberLiveData = MutableLiveData<DataState<Boolean>>()
+    val deletesExpenseLiveData = MutableLiveData<DataState<Boolean>>()
+    val updateExpenseMemberLiveData = MutableLiveData<DataState<ExpenseMember>>()
     private var _expenseId: Long? = null
+    private var _receiptId: Long? = null
     private var selectedUserId: Long? = null
 
-    fun init(expenseId: Long) {
+    fun init(expenseId: Long, receiptId: Long) {
+        _receiptId = receiptId
         _expenseId = expenseId
         getAllExpenseMembers()
         getAllUsers()
@@ -43,17 +48,17 @@ class DetailsExpenseViewModel @Inject constructor(
 
     fun createUser(name: String) {
         if (name.isBlank()) {
-            createUserState.value = DataState.Error("Пожалуйста, введите имя пользователя")
+            createUserLiveData.value = DataState.Error("Пожалуйста, введите имя пользователя")
             return
         }
 
         viewModelScope.launch {
-            createUserState.value = DataState.Loading()
+            createUserLiveData.value = DataState.Loading()
             val createUser = CreateNotRegisteredUser(name)
-            val response = userRepository.createUser(createUser)
+            val response = userRepository.create(createUser)
 
             if (response.isSuccessful) {
-                createUserState.value = DataState.Success(response.body()!!)
+                createUserLiveData.value = DataState.Success(response.body()!!)
                 // Обновляем список пользователей после создания
                 getAllUsers()
             } else {
@@ -67,26 +72,26 @@ class DetailsExpenseViewModel @Inject constructor(
                 } else {
                     "Empty error body (HTTP ${response.code()})"
                 }
-                createUserState.value = DataState.Error(errorMessage)
+                createUserLiveData.value = DataState.Error(errorMessage)
             }
         }
     }
 
     fun createExpenseMember() {
         if (selectedUserId == null) {
-            createExpenseMemberState.value = DataState.Error("Пожалуйста, выберите пользователя")
+            createExpenseMemberLiveData.value = DataState.Error("Пожалуйста, выберите пользователя")
             return
         }
 
         _expenseId?.let { expenseId ->
             viewModelScope.launch {
-                createExpenseMemberState.value = DataState.Loading()
+                createExpenseMemberLiveData.value = DataState.Loading()
                 try {
                     val expenseMemberCreate = ExpenseMemberCreate(selectedUserId!!)
                     val response = expenseMemberRepository.create(expenseMemberCreate, expenseId)
 
                     if (response.isSuccessful) {
-                        createExpenseMemberState.value = DataState.Success(response.body()!!)
+                        createExpenseMemberLiveData.value = DataState.Success(response.body()!!)
                         // Обновляем список участников после создания
                         getAllExpenseMembers()
                     } else {
@@ -100,10 +105,10 @@ class DetailsExpenseViewModel @Inject constructor(
                         } else {
                             "Empty error body (HTTP ${response.code()})"
                         }
-                        createExpenseMemberState.value = DataState.Error(errorMessage)
+                        createExpenseMemberLiveData.value = DataState.Error(errorMessage)
                     }
                 } catch (e: Exception) {
-                    createExpenseMemberState.value = DataState.Error("Ошибка сети: ${e.message}")
+                    createExpenseMemberLiveData.value = DataState.Error("Ошибка сети: ${e.message}")
                 }
             }
         }
@@ -112,14 +117,14 @@ class DetailsExpenseViewModel @Inject constructor(
     fun deleteExpenseMember(expenseMemberId: Long) {
         _expenseId?.let { expenseId ->
             viewModelScope.launch {
-                deleteExpenseMemberState.value = DataState.Loading()
+                deleteExpenseMemberLiveData.value = DataState.Loading()
                 try {
                     expenseMemberRepository.delete(expenseMemberId, expenseId)
-                    deleteExpenseMemberState.value = DataState.Success(Unit)
+                    deleteExpenseMemberLiveData.value = DataState.Success(true)
                     // Обновляем список участников после удаления
                     getAllExpenseMembers()
                 } catch (e: Exception) {
-                    deleteExpenseMemberState.value =
+                    deleteExpenseMemberLiveData.value =
                         DataState.Error("Ошибка при удалении участника: ${e.message}")
                 }
             }
@@ -129,17 +134,17 @@ class DetailsExpenseViewModel @Inject constructor(
     fun updateExpenseMember(expenseMemberId: Long, userId: Long) {
         _expenseId?.let { expenseId ->
             viewModelScope.launch {
-                updateExpenseMemberState.value = DataState.Loading()
+                updateExpenseMemberLiveData.value = DataState.Loading()
                 try {
                     val expenseMemberUpdate = ExpenseMemberUpdate(userId)
                     val response = expenseMemberRepository.update(
+                        expenseMemberUpdate,
                         expenseMemberId,
-                        expenseId,
-                        expenseMemberUpdate
+                        expenseId
                     )
 
                     if (response.isSuccessful) {
-                        updateExpenseMemberState.value = DataState.Success(response.body()!!)
+                        updateExpenseMemberLiveData.value = DataState.Success(response.body()!!)
                         // Обновляем список участников после обновления
                         getAllExpenseMembers()
                     } else {
@@ -153,10 +158,10 @@ class DetailsExpenseViewModel @Inject constructor(
                         } else {
                             "Empty error body (HTTP ${response.code()})"
                         }
-                        updateExpenseMemberState.value = DataState.Error(errorMessage)
+                        updateExpenseMemberLiveData.value = DataState.Error(errorMessage)
                     }
                 } catch (e: Exception) {
-                    updateExpenseMemberState.value = DataState.Error("Ошибка сети: ${e.message}")
+                    updateExpenseMemberLiveData.value = DataState.Error("Ошибка сети: ${e.message}")
                 }
             }
         }
@@ -186,11 +191,11 @@ class DetailsExpenseViewModel @Inject constructor(
     }
 
     private fun getAllUsers() = viewModelScope.launch {
-        allUsersState.postValue(DataState.Loading())
+        allUsersLiveData.postValue(DataState.Loading())
         try {
             val response = userRepository.getAllUser()
             if (response.isSuccessful) {
-                allUsersState.postValue(DataState.Success(response.body() as List<User>))
+                allUsersLiveData.postValue(DataState.Success(response.body() as List<User>))
             } else {
                 val errorBody = response.errorBody()?.string()
                 val errorMessage = if (!errorBody.isNullOrEmpty()) {
@@ -202,10 +207,24 @@ class DetailsExpenseViewModel @Inject constructor(
                 } else {
                     "Empty error body (HTTP ${response.code()})"
                 }
-                allUsersState.postValue(DataState.Error(errorMessage))
+                allUsersLiveData.postValue(DataState.Error(errorMessage))
             }
         } catch (e: Exception) {
-            allUsersState.postValue(DataState.Error("Ошибка сети: ${e.message}"))
+            allUsersLiveData.postValue(DataState.Error("Ошибка сети: ${e.message}"))
+        }
+    }
+
+    fun deleteExpense() = viewModelScope.launch {
+        _receiptId?.let { receiptId ->
+            _expenseId?.let { expenseId ->
+                deletesExpenseLiveData.postValue(DataState.Loading())
+                try {
+                    expenseRepository.delete(expenseId, receiptId)
+                    deletesExpenseLiveData.postValue(DataState.Success(true))
+                } catch (e: Exception) {
+                    deletesExpenseLiveData.postValue(DataState.Error("Ошибка при удалении покупки: ${e.message}"))
+                }
+            }
         }
     }
 }

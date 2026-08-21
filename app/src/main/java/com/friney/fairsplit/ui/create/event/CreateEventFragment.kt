@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.databinding.FragmentCreateEventBinding
 import com.friney.fairsplit.ui.navigation.FragmentNavigator
@@ -37,6 +38,8 @@ class CreateEventFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        fragmentNavigator.setNavController(findNavController())
 
         mBinding.backButton.setOnClickListener {
             fragmentNavigator.navigateBack()

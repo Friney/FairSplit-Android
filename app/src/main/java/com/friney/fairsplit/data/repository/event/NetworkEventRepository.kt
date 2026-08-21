@@ -10,12 +10,10 @@ class NetworkEventRepository @Inject constructor(private val eventService: Event
 
     override suspend fun getAll() = eventService.getAll()
 
-    override suspend fun delete(id: Long) {
-        eventService.delete(id)
-    }
+    override suspend fun create(eventCreate: EventCreate) = eventService.create(eventCreate)
 
     override suspend fun update(eventUpdate: EventUpdate, id: Long) =
         eventService.update(eventUpdate, id)
 
-    override suspend fun create(eventCreate: EventCreate) = eventService.create(eventCreate)
+    override suspend fun delete(id: Long) = eventService.delete(id)
 }

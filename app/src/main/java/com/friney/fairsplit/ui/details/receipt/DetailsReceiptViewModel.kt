@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.friney.fairsplit.data.repository.expense.ExpenseRepository
+import com.friney.fairsplit.data.repository.receipt.ReceiptRepository
 import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.network.model.expense.Expense
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,14 +14,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailsReceiptViewModel @Inject constructor(
+    private val receiptRepository: ReceiptRepository,
     private val expenseRepository: ExpenseRepository
 ) : ViewModel() {
 
     val expensesLiveData = MutableLiveData<DataState<List<Expense>>>()
+    val deletesReceiptLiveData = MutableLiveData<DataState<Boolean>>()
     private var _receiptId: Long? = null
+    private var _eventId: Long? = null
 
-    fun init(receiptId: Long) {
+    fun init(receiptId: Long, eventId: Long) {
         _receiptId = receiptId
+        _eventId = eventId
         getAllExpenses()
     }
 
@@ -42,6 +47,20 @@ class DetailsReceiptViewModel @Inject constructor(
                         "Empty error body (HTTP ${it.code()})"
                     }
                     expensesLiveData.postValue(DataState.Error(errorMessage))
+                }
+            }
+        }
+    }
+
+    fun deleteReceipt() = viewModelScope.launch {
+        _eventId?.let { eventId ->
+            _receiptId?.let { receiptId ->
+                deletesReceiptLiveData.postValue(DataState.Loading())
+                try {
+                    receiptRepository.delete(receiptId, eventId)
+                    deletesReceiptLiveData.postValue(DataState.Success(true))
+                } catch (e: Exception) {
+                    deletesReceiptLiveData.postValue(DataState.Error("Ошибка при удалении чека: ${e.message}"))
                 }
             }
         }

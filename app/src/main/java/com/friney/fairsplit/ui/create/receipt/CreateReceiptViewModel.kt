@@ -48,7 +48,7 @@ class CreateReceiptViewModel @Inject constructor(
         viewModelScope.launch {
             createUserState.value = DataState.Loading()
             val createUser = CreateNotRegisteredUser(name)
-            val response = userRepository.createUser(createUser)
+            val response = userRepository.create(createUser)
 
             if (response.isSuccessful) {
                 createUserState.value = DataState.Success(response.body()!!)

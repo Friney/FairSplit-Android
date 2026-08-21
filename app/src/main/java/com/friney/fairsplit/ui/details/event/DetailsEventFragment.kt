@@ -12,6 +12,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.friney.fairsplit.R
 import com.friney.fairsplit.data.utility.DataState
@@ -44,6 +45,8 @@ class DetailsEventFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViewPager()
+
+        fragmentNavigator.setNavController(findNavController())
 
         val eventArg = bundleArgs.event
         eventArg.let { event ->

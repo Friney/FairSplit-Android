@@ -1,5 +1,6 @@
 package com.friney.fairsplit
 
+import android.content.res.Resources
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
@@ -22,6 +23,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        Resources.getSystem().configuration.fontScale = 1.0f
 
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.navigation_host_fragment) as NavHostFragment

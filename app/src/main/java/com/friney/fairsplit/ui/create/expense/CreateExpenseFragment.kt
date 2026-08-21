@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.databinding.FragmentCreateExpenseBinding
@@ -41,6 +42,8 @@ class CreateExpenseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        fragmentNavigator.setNavController(findNavController())
+
         mBinding.backButton.setOnClickListener {
             fragmentNavigator.navigateBack()
         }
@@ -49,7 +52,7 @@ class CreateExpenseFragment : Fragment() {
             Log.e("Create expense", "Create expense")
             val name = mBinding.nameInput.text.toString()
             val amountStr = mBinding.amountInput.text.toString()
-            
+
             try {
                 val amount = BigDecimal(amountStr)
                 val receiptId = bundleArgs.receiptId

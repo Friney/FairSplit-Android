@@ -8,7 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -20,12 +22,17 @@ import com.friney.fairsplit.R
 import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.databinding.FragmentDetailsReceiptBinding
 import com.friney.fairsplit.ui.adapter.ExpenseAdapter
+import com.friney.fairsplit.ui.navigation.FragmentNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import java.math.BigDecimal
 import java.text.DecimalFormat
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class DetailsReceiptFragment : Fragment() {
+
+    @Inject
+    lateinit var fragmentNavigator: FragmentNavigator
 
     private var _binding: FragmentDetailsReceiptBinding? = null
     private val mBinding get() = _binding!!
@@ -46,7 +53,10 @@ class DetailsReceiptFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initAdapter()
 
+        fragmentNavigator.setNavController(findNavController())
+
         val receiptArg = bundleArgs.receipt
+        val eventId = bundleArgs.eventId
         receiptArg.let { receipt ->
             val amount = receipt.expenses
                 .map { it.amount }
@@ -54,7 +64,7 @@ class DetailsReceiptFragment : Fragment() {
             mBinding.receiptName.text = receipt.name
             mBinding.receiptPayer.text = receipt.paidByUser.name
             mBinding.receiptTotal.text = DecimalFormat("#,##0.00").format(amount)
-            viewModel.init(receipt.id)
+            viewModel.init(receipt.id, eventId)
         }
 
         mBinding.backButton.setOnClickListener {
@@ -65,7 +75,6 @@ class DetailsReceiptFragment : Fragment() {
             showPopupMenu(view)
         }
 
-        // Кнопка добавления покупки
         mBinding.addExpenseButton.setOnClickListener {
             val receiptId = bundleArgs.receipt.id
             val bundle = bundleOf("receiptId" to receiptId)
@@ -76,7 +85,8 @@ class DetailsReceiptFragment : Fragment() {
         }
 
         expenseAdapter.setOnItemClickListener {
-            val bundle = bundleOf("expense" to it)
+            val receiptId = bundleArgs.receipt.id
+            val bundle = bundleOf("expense" to it, "receiptId" to receiptId)
             view.findNavController().navigate(
                 R.id.action_detailsReceiptFragment_to_detailsExpenseFragment,
                 bundle
@@ -105,8 +115,27 @@ class DetailsReceiptFragment : Fragment() {
             }
         }
 
+        viewModel.deletesReceiptLiveData.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is DataState.Loading -> {
+                    mBinding.progressBar.visibility = View.VISIBLE
+                }
 
+                is DataState.Success -> {
+                    mBinding.progressBar.visibility = View.GONE
+                    fragmentNavigator.navigateBack()
+                }
 
+                is DataState.Error -> {
+                    mBinding.progressBar.visibility = View.GONE
+                    Toast.makeText(
+                        context,
+                        state.message ?: "Неизвестная ошибка",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
     }
 
     private fun initAdapter() {
@@ -133,7 +162,7 @@ class DetailsReceiptFragment : Fragment() {
                 }
 
                 R.id.menu_delete -> {
-                    // Действие при удалении
+                    showDeleteConfirmationDialog()
                     true
                 }
 
@@ -142,5 +171,16 @@ class DetailsReceiptFragment : Fragment() {
         }
 
         popup.show()
+    }
+
+    private fun showDeleteConfirmationDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Удаление чека")
+            .setMessage("Вы точно уверены, что хотите удалить этот чек? Это действие нельзя отменить.")
+            .setPositiveButton("Удалить") { _, _ ->
+                viewModel.deleteReceipt()
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
     }
 }

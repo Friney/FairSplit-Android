@@ -9,6 +9,6 @@ class NetworkUserRepository @Inject constructor(private val userService: UserSer
 
     override suspend fun getAllUser() = userService.getAllUser()
 
-    override suspend fun createUser(create: CreateNotRegisteredUser) =
-        userService.createUser(create)
+    override suspend fun create(create: CreateNotRegisteredUser) =
+        userService.create(create)
 }

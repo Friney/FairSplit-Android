@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FairSplit"
+rootProject.name = "FairSplit-Android"
 include(":app")
  

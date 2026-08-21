@@ -30,8 +30,8 @@
             android:id="@+id/event_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="@dimen/tab_item_padding"
+            android:layout_marginTop="@dimen/summary_card_margin"
             android:gravity="center"
             android:textSize="30sp"
             android:textStyle="bold"
@@ -44,8 +44,8 @@
             android:id="@+id/event_description"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginHorizontal="@dimen/tab_item_padding"
+            android:layout_marginTop="@dimen/summary_card_margin"
             android:gravity="center"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -55,12 +55,14 @@
 
     <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            app:layout_constraintWidth_percent="0.9"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/summary_card_margin"
             app:layout_constraintTop_toBottomOf="@id/event_description"
             app:tabMode="fixed"
-            app:tabGravity="fill" />
+            app:tabGravity="fill"
+            tools:ignore="MissingConstraints" />
 
     <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager"
@@ -76,9 +78,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

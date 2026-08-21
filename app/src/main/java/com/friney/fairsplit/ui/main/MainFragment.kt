@@ -7,7 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.databinding.FragmentMainBinding
@@ -25,7 +27,7 @@ class MainFragment : Fragment() {
 
     private var _binding: FragmentMainBinding? = null
     private val mBinding get() = _binding!!
-    private val viewModel by viewModels<MainViewModel>()
+    private val viewModel by activityViewModels<MainViewModel>()
     private val authViewModel by viewModels<AuthViewModel>()
     lateinit var eventAdapter: EventAdapter
 
@@ -39,6 +41,8 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        fragmentNavigator.setNavController(findNavController())
 
         val isLogin = authViewModel.isLoggedIn()
         Log.i("isLogin", isLogin.toString())
