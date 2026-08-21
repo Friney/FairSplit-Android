@@ -17,6 +17,7 @@ import androidx.navigation.fragment.navArgs
 import com.friney.fairsplit.R
 import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.databinding.FragmentDetailsEventBinding
+import com.friney.fairsplit.network.model.event.Event
 import com.friney.fairsplit.ui.navigation.FragmentNavigator
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,6 +33,7 @@ class DetailsEventFragment : Fragment() {
     private val mBinding get() = _binding!!
     private val bundleArgs: DetailsEventFragmentArgs by navArgs()
     private val viewModel: DetailsEventViewModel by activityViewModels()
+    private lateinit var currentEvent: Event
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,11 +51,10 @@ class DetailsEventFragment : Fragment() {
         fragmentNavigator.setNavController(findNavController())
 
         val eventArg = bundleArgs.event
-        eventArg.let { event ->
-            mBinding.eventName.text = event.name
-            mBinding.eventDescription.text = event.description
-            viewModel.init(event.id)
-        }
+        currentEvent = eventArg
+        mBinding.eventName.text = currentEvent.name
+        mBinding.eventDescription.text = currentEvent.description
+        viewModel.init(currentEvent.id)
 
         mBinding.backButton.setOnClickListener {
             fragmentNavigator.navigateBack()
@@ -83,6 +84,33 @@ class DetailsEventFragment : Fragment() {
                     ).show()
                 }
             }
+
+            viewModel.updateEventLiveData.observe(viewLifecycleOwner) { state ->
+                when (state) {
+                    is DataState.Loading -> {
+                        mBinding.deleteProgressBar.visibility = View.VISIBLE
+                    }
+
+                    is DataState.Success -> {
+                        mBinding.deleteProgressBar.visibility = View.GONE
+                        state.data?.let { updatedEvent ->
+                            currentEvent = updatedEvent
+                            mBinding.eventName.text = updatedEvent.name
+                            mBinding.eventDescription.text = updatedEvent.description
+                        }
+                        Toast.makeText(context, "Событие обновлено", Toast.LENGTH_SHORT).show()
+                    }
+
+                    is DataState.Error -> {
+                        mBinding.deleteProgressBar.visibility = View.GONE
+                        Toast.makeText(
+                            context,
+                            state.message ?: "Неизвестная ошибка",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
         }
     }
 
@@ -108,7 +136,11 @@ class DetailsEventFragment : Fragment() {
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.menu_edit -> {
-                    // Действие при редактировании
+                    val action =
+                        DetailsEventFragmentDirections.actionDetailsEventFragmentToEditEventFragment(
+                            currentEvent
+                        )
+                    findNavController().navigate(action)
                     true
                 }
 

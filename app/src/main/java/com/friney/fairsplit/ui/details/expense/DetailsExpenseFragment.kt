@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.friney.fairsplit.R
 import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.databinding.FragmentDetailsExpenseBinding
+import com.friney.fairsplit.network.model.expense.Expense
 import com.friney.fairsplit.network.model.expense.member.ExpenseMember
 import com.friney.fairsplit.network.model.user.User
 import com.friney.fairsplit.ui.adapter.ExpenseMemberAdapter
@@ -28,6 +29,7 @@ import com.friney.fairsplit.ui.adapter.UsersAdapter
 import com.friney.fairsplit.ui.navigation.FragmentNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.DecimalFormat
 import javax.inject.Inject
 
@@ -45,6 +47,9 @@ class DetailsExpenseFragment : Fragment() {
     private lateinit var usersAdapter: UsersAdapter
     private var allUsers: List<User> = emptyList()
     private var currentEditingExpenseMemberId: Long? = null
+    private var currentEditingExpenseMemberUserId: Long? = null
+    private lateinit var currentExpense: Expense
+    private var currentExpenseAmount: BigDecimal = BigDecimal.ZERO
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,11 +69,11 @@ class DetailsExpenseFragment : Fragment() {
 
         val expenseArg = bundleArgs.expense
         val receiptId = bundleArgs.receiptId
-        expenseArg.let { expense ->
-            mBinding.expenseName.text = expense.name
-            mBinding.expensePrice.text = DecimalFormat("#,##0.00").format(expense.amount)
-            viewModel.init(expense.id, receiptId)
-        }
+        currentExpense = expenseArg
+        currentExpenseAmount = currentExpense.amount
+        mBinding.expenseName.text = currentExpense.name
+        mBinding.expensePrice.text = DecimalFormat("#,##0.00").format(currentExpenseAmount)
+        viewModel.init(currentExpense.id, receiptId)
 
         mBinding.backButton.setOnClickListener {
             fragmentNavigator.navigateBack()
@@ -110,8 +115,17 @@ class DetailsExpenseFragment : Fragment() {
             viewModel.selectUser(user.id)
 
             if (currentEditingExpenseMemberId != null) {
-                viewModel.updateExpenseMember(currentEditingExpenseMemberId!!, user.id)
+                if (currentEditingExpenseMemberUserId == user.id) {
+                    Toast.makeText(
+                        context,
+                        "Выбран тот же пользователь",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    viewModel.updateExpenseMember(currentEditingExpenseMemberId!!, user.id)
+                }
                 currentEditingExpenseMemberId = null
+                currentEditingExpenseMemberUserId = null
             } else {
                 viewModel.createExpenseMember()
             }
@@ -158,7 +172,7 @@ class DetailsExpenseFragment : Fragment() {
                     response.data?.let { expenseMembers ->
                         val size = if (expenseMembers.isEmpty()) 1 else expenseMembers.size
                         val amountByOnePerson =
-                            bundleArgs.expense.amount.divide(BigDecimal(size), 2)
+                            currentExpenseAmount.divide(BigDecimal(size), 2, RoundingMode.HALF_UP)
                         expenseMemberAdapter.setAmountByOnePerson(amountByOnePerson)
                         expenseMemberAdapter.differ.submitList(expenseMembers)
                     }
@@ -307,6 +321,45 @@ class DetailsExpenseFragment : Fragment() {
                 }
             }
         }
+
+        viewModel.updateExpenseLiveData.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is DataState.Success -> {
+                    mBinding.progressBar.visibility = View.INVISIBLE
+                    state.data?.let { updatedExpense ->
+                        currentExpense = updatedExpense
+                        currentExpenseAmount = updatedExpense.amount
+                        mBinding.expenseName.text = updatedExpense.name
+                        mBinding.expensePrice.text =
+                            DecimalFormat("#,##0.00").format(updatedExpense.amount)
+
+                        val membersCount = expenseMemberAdapter.differ.currentList.size
+                        val size = if (membersCount == 0) 1 else membersCount
+                        val amountByOnePerson =
+                            currentExpenseAmount.divide(BigDecimal(size), 2, RoundingMode.HALF_UP)
+                        expenseMemberAdapter.setAmountByOnePerson(amountByOnePerson)
+                    }
+                    Toast.makeText(
+                        context,
+                        "Покупка успешно обновлена!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is DataState.Error -> {
+                    mBinding.progressBar.visibility = View.INVISIBLE
+                    Toast.makeText(
+                        context,
+                        state.message ?: "Неизвестная ошибка",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                is DataState.Loading -> {
+                    mBinding.progressBar.visibility = View.VISIBLE
+                }
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -340,7 +393,12 @@ class DetailsExpenseFragment : Fragment() {
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.menu_edit -> {
-                    // Действие при редактировании
+                    val action =
+                        DetailsExpenseFragmentDirections.actionDetailsExpenseFragmentToEditExpenseFragment(
+                            currentExpense,
+                            bundleArgs.receiptId
+                        )
+                    findNavController().navigate(action)
                     true
                 }
 
@@ -378,6 +436,7 @@ class DetailsExpenseFragment : Fragment() {
                         mBinding.userSearch.setText("")
                         usersAdapter.differ.submitList(allUsers)
                         currentEditingExpenseMemberId = expenseMember.id
+                        currentEditingExpenseMemberUserId = expenseMember.user.id
                         true
                     }
 

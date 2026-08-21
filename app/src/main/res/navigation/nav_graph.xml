@@ -48,6 +48,9 @@
         <action
                 android:id="@+id/action_detailsEventFragment_to_createReceiptFragment"
                 app:destination="@id/createReceiptFragment" />
+        <action
+                android:id="@+id/action_detailsEventFragment_to_editEventFragment"
+                app:destination="@id/editEventFragment" />
     </fragment>
     <fragment
             android:id="@+id/detailsReceiptFragment"
@@ -63,6 +66,9 @@
         <action
                 android:id="@+id/action_detailsReceiptFragment_to_createExpenseFragment"
                 app:destination="@id/createExpenseFragment" />
+        <action
+                android:id="@+id/action_detailsReceiptFragment_to_editReceiptFragment"
+                app:destination="@id/editReceiptFragment" />
         <argument
                 android:name="eventId"
                 app:argType="long" />
@@ -72,6 +78,42 @@
             android:name="com.friney.fairsplit.ui.details.expense.DetailsExpenseFragment"
             android:label="fragment_details_expense"
             tools:layout="@layout/fragment_details_expense">
+        <argument
+                android:name="expense"
+                app:argType="com.friney.fairsplit.network.model.expense.Expense" />
+        <argument
+                android:name="receiptId"
+                app:argType="long" />
+        <action
+                android:id="@+id/action_detailsExpenseFragment_to_editExpenseFragment"
+                app:destination="@id/editExpenseFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/editEventFragment"
+            android:name="com.friney.fairsplit.ui.edit.event.EditEventFragment"
+            android:label="fragment_edit_event"
+            tools:layout="@layout/fragment_edit_event">
+        <argument
+                android:name="event"
+                app:argType="com.friney.fairsplit.network.model.event.Event" />
+    </fragment>
+    <fragment
+            android:id="@+id/editReceiptFragment"
+            android:name="com.friney.fairsplit.ui.edit.receipt.EditReceiptFragment"
+            android:label="fragment_edit_receipt"
+            tools:layout="@layout/fragment_edit_receipt">
+        <argument
+                android:name="receipt"
+                app:argType="com.friney.fairsplit.network.model.receipt.Receipt" />
+        <argument
+                android:name="eventId"
+                app:argType="long" />
+    </fragment>
+    <fragment
+            android:id="@+id/editExpenseFragment"
+            android:name="com.friney.fairsplit.ui.edit.expense.EditExpenseFragment"
+            android:label="fragment_edit_expense"
+            tools:layout="@layout/fragment_edit_expense">
         <argument
                 android:name="expense"
                 app:argType="com.friney.fairsplit.network.model.expense.Expense" />

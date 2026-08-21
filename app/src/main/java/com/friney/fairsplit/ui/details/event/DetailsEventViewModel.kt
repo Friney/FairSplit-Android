@@ -7,6 +7,7 @@ import com.friney.fairsplit.data.repository.event.EventRepository
 import com.friney.fairsplit.data.repository.receipt.ReceiptRepository
 import com.friney.fairsplit.data.repository.summary.SummaryRepository
 import com.friney.fairsplit.data.utility.DataState
+import com.friney.fairsplit.network.model.event.Event
 import com.friney.fairsplit.network.model.receipt.Receipt
 import com.friney.fairsplit.network.model.summary.Summary
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +25,7 @@ class DetailsEventViewModel @Inject constructor(
     val receiptsLiveData = MutableLiveData<DataState<List<Receipt>>>()
     val summaryLiveData = MutableLiveData<DataState<Summary>>()
     val deleteEventLiveData = MutableLiveData<DataState<Boolean>>()
+    val updateEventLiveData = MutableLiveData<DataState<Event>>()
     private var _eventId: Long? = null
 
     fun getEventId(): Long? = _eventId

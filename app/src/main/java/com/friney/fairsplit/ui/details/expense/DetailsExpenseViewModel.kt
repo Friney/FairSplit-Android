@@ -7,6 +7,7 @@ import com.friney.fairsplit.data.repository.expense.ExpenseRepository
 import com.friney.fairsplit.data.repository.expense.member.ExpenseMemberRepository
 import com.friney.fairsplit.data.repository.user.UserRepository
 import com.friney.fairsplit.data.utility.DataState
+import com.friney.fairsplit.network.model.expense.Expense
 import com.friney.fairsplit.network.model.expense.member.ExpenseMember
 import com.friney.fairsplit.network.model.expense.member.ExpenseMemberCreate
 import com.friney.fairsplit.network.model.expense.member.ExpenseMemberUpdate
@@ -31,6 +32,7 @@ class DetailsExpenseViewModel @Inject constructor(
     val deleteExpenseMemberLiveData = MutableLiveData<DataState<Boolean>>()
     val deletesExpenseLiveData = MutableLiveData<DataState<Boolean>>()
     val updateExpenseMemberLiveData = MutableLiveData<DataState<ExpenseMember>>()
+    val updateExpenseLiveData = MutableLiveData<DataState<Expense>>()
     private var _expenseId: Long? = null
     private var _receiptId: Long? = null
     private var selectedUserId: Long? = null

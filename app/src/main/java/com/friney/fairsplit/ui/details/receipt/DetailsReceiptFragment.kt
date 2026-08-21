@@ -21,6 +21,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.friney.fairsplit.R
 import com.friney.fairsplit.data.utility.DataState
 import com.friney.fairsplit.databinding.FragmentDetailsReceiptBinding
+import com.friney.fairsplit.network.model.receipt.Receipt
+import com.friney.fairsplit.network.model.user.User
 import com.friney.fairsplit.ui.adapter.ExpenseAdapter
 import com.friney.fairsplit.ui.navigation.FragmentNavigator
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,6 +41,8 @@ class DetailsReceiptFragment : Fragment() {
     private val viewModel by viewModels<DetailsReceiptViewModel>()
     private val bundleArgs: DetailsReceiptFragmentArgs by navArgs()
     lateinit var expenseAdapter: ExpenseAdapter
+    private lateinit var currentReceipt: Receipt
+    private var allUsers: List<User> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,15 +61,14 @@ class DetailsReceiptFragment : Fragment() {
 
         val receiptArg = bundleArgs.receipt
         val eventId = bundleArgs.eventId
-        receiptArg.let { receipt ->
-            val amount = receipt.expenses
-                .map { it.amount }
-                .fold(BigDecimal.ZERO) { acc, current -> acc.add(current) }
-            mBinding.receiptName.text = receipt.name
-            mBinding.receiptPayer.text = receipt.paidByUser.name
-            mBinding.receiptTotal.text = DecimalFormat("#,##0.00").format(amount)
-            viewModel.init(receipt.id, eventId)
-        }
+        currentReceipt = receiptArg
+        val amount = currentReceipt.expenses
+            .map { it.amount }
+            .fold(BigDecimal.ZERO) { acc, current -> acc.add(current) }
+        mBinding.receiptName.text = currentReceipt.name
+        mBinding.receiptPayer.text = currentReceipt.paidByUser.name
+        mBinding.receiptTotal.text = DecimalFormat("#,##0.00").format(amount)
+        viewModel.init(currentReceipt.id, eventId)
 
         mBinding.backButton.setOnClickListener {
             findNavController().navigateUp()
@@ -136,6 +139,52 @@ class DetailsReceiptFragment : Fragment() {
                 }
             }
         }
+
+        viewModel.allUsersLiveData.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is DataState.Success -> {
+                    allUsers = state.data ?: emptyList()
+                }
+
+                is DataState.Error -> {
+                    Toast.makeText(
+                        context,
+                        state.message ?: "Не удалось загрузить пользователей",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                is DataState.Loading -> {
+                }
+            }
+        }
+
+        viewModel.updateReceiptLiveData.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is DataState.Loading -> {
+                    mBinding.progressBar.visibility = View.VISIBLE
+                }
+
+                is DataState.Success -> {
+                    mBinding.progressBar.visibility = View.GONE
+                    state.data?.let { updatedReceipt ->
+                        currentReceipt = updatedReceipt
+                        mBinding.receiptName.text = updatedReceipt.name
+                        mBinding.receiptPayer.text = updatedReceipt.paidByUser.name
+                    }
+                    Toast.makeText(context, "Чек обновлён", Toast.LENGTH_SHORT).show()
+                }
+
+                is DataState.Error -> {
+                    mBinding.progressBar.visibility = View.GONE
+                    Toast.makeText(
+                        context,
+                        state.message ?: "Неизвестная ошибка",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
     }
 
     private fun initAdapter() {
@@ -157,7 +206,12 @@ class DetailsReceiptFragment : Fragment() {
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.menu_edit -> {
-                    // Действие при редактировании
+                    val action =
+                        DetailsReceiptFragmentDirections.actionDetailsReceiptFragmentToEditReceiptFragment(
+                            currentReceipt,
+                            bundleArgs.eventId
+                        )
+                    findNavController().navigate(action)
                     true
                 }
 
