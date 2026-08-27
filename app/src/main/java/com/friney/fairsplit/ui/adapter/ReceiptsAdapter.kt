@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.friney.fairsplit.databinding.ItemReceiptBinding
-import com.friney.fairsplit.network.model.Receipt
+import com.friney.fairsplit.network.model.receipt.Receipt
 import java.math.BigDecimal
 import java.text.DecimalFormat
 

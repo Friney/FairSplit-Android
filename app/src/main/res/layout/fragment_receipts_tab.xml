@@ -5,19 +5,32 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/receipt_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginTop="12dp"
             android:clipToPadding="false"
-            android:paddingBottom="50dp"
+            android:paddingBottom="80dp"
             tools:itemCount="2"
             tools:listitem="@layout/item_receipt"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5" />
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_receipt_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/tab_item_padding"
+            android:src="@drawable/ic_add"
+            app:backgroundTint="#E6D6FB"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:tint="@android:color/black"
+            tools:ignore="ContentDescription" />
 
     <ProgressBar
             android:id="@+id/progress_bar"
@@ -27,6 +40,7 @@
             android:visibility="invisible"
             tools:visibility="visible"
             android:background="@android:color/transparent"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

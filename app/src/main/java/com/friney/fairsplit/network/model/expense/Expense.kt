@@ -1,5 +1,6 @@
-package com.friney.fairsplit.network.model
+package com.friney.fairsplit.network.model.expense
 
+import com.friney.fairsplit.network.model.expense.member.ExpenseMember
 import java.io.Serializable
 import java.math.BigDecimal
 

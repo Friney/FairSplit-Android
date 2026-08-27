@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.friney.fairsplit.databinding.ItemExpenseBinding
-import com.friney.fairsplit.network.model.Expense
+import com.friney.fairsplit.network.model.expense.Expense
 import java.text.DecimalFormat
 
 class ExpenseAdapter : RecyclerView.Adapter<ExpenseAdapter.FairSplitViewHolder>() {

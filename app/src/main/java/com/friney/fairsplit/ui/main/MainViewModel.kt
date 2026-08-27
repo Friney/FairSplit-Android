@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.friney.fairsplit.data.repository.event.EventRepository
 import com.friney.fairsplit.data.utility.DataState
-import com.friney.fairsplit.network.model.Event
+import com.friney.fairsplit.network.model.event.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -19,6 +19,10 @@ class MainViewModel @Inject constructor(
     val eventLiveData = MutableLiveData<DataState<List<Event>>>()
 
     init {
+        getAllEvent()
+    }
+
+    fun refreshEvents() {
         getAllEvent()
     }
 
